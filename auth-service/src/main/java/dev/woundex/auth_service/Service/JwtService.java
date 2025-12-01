@@ -19,6 +19,7 @@ public class JwtService {
     public String getJwtToken(User user ){
         return Jwts.builder()
                 .claim("email" , user.getEmail())
+                .claim("role", user.getRole())
                 .subject(user.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) 

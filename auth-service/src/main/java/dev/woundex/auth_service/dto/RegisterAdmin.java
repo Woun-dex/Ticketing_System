@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class RegisterAdmin {
+
     private String email;
     private String username;
     private String password;
