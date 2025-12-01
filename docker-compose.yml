@@ -4,11 +4,11 @@ services:
     image: postgres:15
     container_name: postgres
     environment:
-      POSTGRES_USER: ticket_user
-      POSTGRES_PASSWORD: ticket_pass
-      POSTGRES_DB: ticketing
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: ticket
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
 
