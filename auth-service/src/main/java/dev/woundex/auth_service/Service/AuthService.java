@@ -4,6 +4,7 @@ import dev.woundex.auth_service.Entities.User;
 import dev.woundex.auth_service.Repository.UserRepository;
 import dev.woundex.auth_service.dto.AuthResponse;
 import dev.woundex.auth_service.dto.LoginRequest;
+import dev.woundex.auth_service.dto.RegisterAdmin;
 import dev.woundex.auth_service.dto.RegisterRequest;
 import dev.woundex.auth_service.dto.UserResponse;
 import lombok.RequiredArgsConstructor;
@@ -33,8 +34,9 @@ public class AuthService {
                 .email(request.getEmail())
                 .username(request.getUsername())
                 .password(encoder.encode(request.getPassword()))
+                .role("USER")
                 .build();
-
+        
         repo.save(user);
 
         String token = jwtService.getJwtToken(user);
@@ -50,6 +52,28 @@ public class AuthService {
 
         String token = jwtService.getJwtToken(user);
         return new AuthResponse(token);
+    }
+
+    public AuthResponse registerAdmin(RegisterAdmin request){
+        String adminSecret = System.getProperty("admin.secret");
+        if ( !request.getAdminSecret().equals(adminSecret) ){
+            throw new RuntimeException("Invalid Admin Secret!");
+        }
+        User existUser = repo.findByEmail(request.getEmail()).orElse(null);
+        if ( existUser != null ){
+            throw new RuntimeException("Admin already exists!");
+        }
+
+        User user = User.builder()
+                .email(request.getEmail())
+                .username(request.getUsername())
+                .password(encoder.encode(request.getPassword()))
+                .role("ADMIN")
+                .build();
+
+        repo.save(user);
+        String token = jwtService.getJwtToken(user);
+        return new AuthResponse(token); 
     }
 
  public AuthResponse generateQueueToken(String token , String eventId){
