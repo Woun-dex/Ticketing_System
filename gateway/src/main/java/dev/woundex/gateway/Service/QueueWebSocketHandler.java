@@ -42,20 +42,6 @@ public class QueueWebSocketHandler implements WebSocketHandler {
         return session.send(queuePositionFlux.map(session::textMessage));
     }
 
-    @Scheduled(fixedRate = 1000)
-    public void promoteUsers() {
-        String eventId = "event123";
-        String waitingKey = "queue:waiting:" + eventId;
-        String activeKey = "queue:active:" + eventId;
-        int ALLOWED_PER_SECOND = 50;
 
-        redisTemplate.opsForZSet()
-                .popMin(waitingKey, ALLOWED_PER_SECOND)
-                .flatMap(user -> {
-                    double score = Instant.now().toEpochMilli();
-                    return redisTemplate.opsForZSet().add(activeKey, user.getValue(), score);
-                })
-                .subscribe();
-    }
 }
 

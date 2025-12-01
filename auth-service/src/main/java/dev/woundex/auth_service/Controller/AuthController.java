@@ -3,11 +3,15 @@ package dev.woundex.auth_service.Controller;
 import dev.woundex.auth_service.Service.AuthService;
 import dev.woundex.auth_service.dto.AuthResponse;
 import dev.woundex.auth_service.dto.LoginRequest;
+import dev.woundex.auth_service.dto.RegisterAdmin;
 import dev.woundex.auth_service.dto.RegisterRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -25,6 +29,13 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@RequestBody @Valid LoginRequest request){
         return ResponseEntity.ok(authService.login(request));
     }
+
+    @GetMapping("/admin")
+    public ResponseEntity<AuthResponse> registerAdmin(@RequestBody @Valid RegisterAdmin request){
+        return ResponseEntity.ok(authService.registerAdmin(request));
+    }
+   
+    
 
     @PostMapping("/queue-token")
     public ResponseEntity<AuthResponse> getQueueToken(
