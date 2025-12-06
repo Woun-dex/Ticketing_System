@@ -35,7 +35,12 @@ export class Login {
     this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.router.navigate(['/queue']);
+        // Navigate based on user role
+        if (this.authService.isAdmin()) {
+          this.router.navigate(['/admin']);
+        } else {
+          this.router.navigate(['/queue']);
+        }
       },
       error: (error) => {
         this.isLoading.set(false);

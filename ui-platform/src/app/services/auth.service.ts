@@ -8,6 +8,7 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
+  role?: string;
 }
 
 export interface AuthResponse {
@@ -31,7 +32,7 @@ export interface RegisterRequest {
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly API_URL = 'http://localhost:8080/api/v1/auth';
+  private readonly API_URL = 'http://localhost:8081/api/v1/auth';
   private readonly TOKEN_KEY = 'auth_token';
   private readonly USER_KEY = 'auth_user';
 
@@ -101,5 +102,15 @@ export class AuthService {
 
   getToken(): string | null {
     return this.tokenSignal();
+  }
+
+  getUserRole(): string | null {
+    const user = this.userSignal();
+    return user?.role || null;
+  }
+
+  isAdmin(): boolean {
+    const role = this.getUserRole();
+    return role === 'ADMIN' || role === 'ROLE_ADMIN';
   }
 }
