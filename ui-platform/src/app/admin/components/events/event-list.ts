@@ -1,0 +1,251 @@
+import { Component, OnInit, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { AdminService } from '../../services/admin.service';
+import { Event, EventStatus } from '../../models/admin.models';
+
+@Component({
+  selector: 'app-event-list',
+  standalone: true,
+  imports: [CommonModule, RouterModule, FormsModule],
+  template: `
+    <div class="min-h-screen bg-gray-900">
+      <!-- Header -->
+      <header class="bg-gray-800 border-b border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <a routerLink="/admin" class="text-gray-400 hover:text-white transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+              </a>
+              <h1 class="text-2xl font-bold text-white">Event Management</h1>
+            </div>
+            <a routerLink="/admin/events/create" 
+               class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+              </svg>
+              New Event
+            </a>
+          </div>
+        </div>
+      </header>
+
+      <!-- Filters -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="bg-gray-800 rounded-xl p-4 border border-gray-700 mb-6">
+          <div class="flex flex-wrap items-center gap-4">
+            <!-- Search -->
+            <div class="flex-1 min-w-64">
+              <div class="relative">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input type="text" 
+                       [(ngModel)]="searchQuery"
+                       placeholder="Search events..." 
+                       class="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 transition-colors">
+              </div>
+            </div>
+            
+            <!-- Status Filter -->
+            <select [(ngModel)]="statusFilter" 
+                    class="px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-purple-500">
+              <option value="">All Status</option>
+              <option value="DRAFT">Draft</option>
+              <option value="PUBLISHED">Published</option>
+              <option value="ARCHIVED">Archived</option>
+              <option value="CANCELLED">Cancelled</option>
+            </select>
+
+            <!-- Type Filter -->
+            <select [(ngModel)]="typeFilter"
+                    class="px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-purple-500">
+              <option value="">All Types</option>
+              <option value="concert">Concert</option>
+              <option value="sports">Sports</option>
+              <option value="theater">Theater</option>
+              <option value="conference">Conference</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Events Grid -->
+        @if (adminService.loading()) {
+          <div class="flex items-center justify-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
+          </div>
+        } @else if (filteredEvents().length === 0) {
+          <div class="bg-gray-800 rounded-xl p-12 border border-gray-700 text-center">
+            <svg class="w-16 h-16 text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <h3 class="text-xl font-medium text-white mb-2">No events found</h3>
+            <p class="text-gray-400 mb-6">Get started by creating your first event</p>
+            <a routerLink="/admin/events/create" 
+               class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+              </svg>
+              Create Event
+            </a>
+          </div>
+        } @else {
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @for (event of filteredEvents(); track event.id) {
+              <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden hover:border-purple-500 transition-all group">
+                <!-- Event Header -->
+                <div class="h-32 relative" [class]="getEventBgClass(event.type)">
+                  <div class="absolute inset-0 bg-gradient-to-t from-gray-800 to-transparent"></div>
+                  <div class="absolute top-3 right-3">
+                    <span [class]="getStatusClass(event.status)" class="px-3 py-1 rounded-full text-xs font-medium">
+                      {{ event.status }}
+                    </span>
+                  </div>
+                  <div class="absolute bottom-3 left-4">
+                    <span class="px-2 py-1 bg-gray-800/80 rounded text-xs text-gray-300 capitalize">
+                      {{ event.type }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Event Content -->
+                <div class="p-4">
+                  <h3 class="text-lg font-semibold text-white mb-2 group-hover:text-purple-400 transition-colors">
+                    {{ event.name }}
+                  </h3>
+                  
+                  <div class="space-y-2 text-sm text-gray-400 mb-4">
+                    <div class="flex items-center gap-2">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                      </svg>
+                      <span>{{ formatDate(event.startTime) }}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      <span>{{ formatTime(event.startTime) }} - {{ formatTime(event.endTime) }}</span>
+                    </div>
+                    @if (event.seatTypes && event.seatTypes.length > 0) {
+                      <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                        </svg>
+                        <span>{{ event.seatTypes.length }} seat types</span>
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Actions -->
+                  <div class="flex items-center gap-2">
+                    <a [routerLink]="['/admin/events', event.id]"
+                       class="flex-1 px-4 py-2 bg-gray-700 text-white text-center rounded-lg hover:bg-gray-600 transition-colors text-sm font-medium">
+                      View Details
+                    </a>
+                    <a [routerLink]="['/admin/events', event.id, 'edit']"
+                       class="px-4 py-2 bg-purple-600/20 text-purple-400 rounded-lg hover:bg-purple-600/30 transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                      </svg>
+                    </a>
+                    <button (click)="deleteEvent(event.id, $event)"
+                            class="px-4 py-2 bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600/30 transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  `,
+  styles: ``
+})
+export class EventList implements OnInit {
+  searchQuery = '';
+  statusFilter = '';
+  typeFilter = '';
+
+  constructor(public adminService: AdminService) {}
+
+  filteredEvents = computed(() => {
+    let events = this.adminService.events();
+    
+    if (this.searchQuery) {
+      const query = this.searchQuery.toLowerCase();
+      events = events.filter(e => e.name.toLowerCase().includes(query));
+    }
+    
+    if (this.statusFilter) {
+      events = events.filter(e => e.status === this.statusFilter);
+    }
+    
+    if (this.typeFilter) {
+      events = events.filter(e => e.type.toLowerCase() === this.typeFilter.toLowerCase());
+    }
+    
+    return events;
+  });
+
+  ngOnInit(): void {
+    this.adminService.getAllEvents().subscribe();
+  }
+
+  getStatusClass(status: EventStatus): string {
+    const classes: Record<string, string> = {
+      'DRAFT': 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30',
+      'PUBLISHED': 'bg-green-500/20 text-green-400 border border-green-500/30',
+      'ARCHIVED': 'bg-gray-500/20 text-gray-400 border border-gray-500/30',
+      'CANCELLED': 'bg-red-500/20 text-red-400 border border-red-500/30'
+    };
+    return classes[status] || 'bg-gray-500/20 text-gray-400';
+  }
+
+  getEventBgClass(type: string): string {
+    const classes: Record<string, string> = {
+      'concert': 'bg-gradient-to-br from-purple-600 to-pink-600',
+      'sports': 'bg-gradient-to-br from-green-600 to-teal-600',
+      'theater': 'bg-gradient-to-br from-pink-600 to-rose-600',
+      'conference': 'bg-gradient-to-br from-blue-600 to-indigo-600'
+    };
+    return classes[type.toLowerCase()] || 'bg-gradient-to-br from-gray-600 to-gray-700';
+  }
+
+  formatDate(dateString: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  }
+
+  formatTime(dateString: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  deleteEvent(id: number, event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    if (confirm('Are you sure you want to delete this event?')) {
+      this.adminService.deleteEvent(id).subscribe();
+    }
+  }
+}

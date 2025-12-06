@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DiffGenerationConfig">
+    <option name="snapshotDb" value="false" />
+    <option name="snapshotModelValue" value="admin-service:admin-service" />
+    <option name="sourceModelValue" value="admin-service:admin-service" />
+    <option name="targetDbValue" value="cbf006bc-fdb2-42ad-a2cb-9e9b28ea15a0" />
+  </component>
+</project>

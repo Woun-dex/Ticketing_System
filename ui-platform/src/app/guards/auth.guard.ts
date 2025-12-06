@@ -22,6 +22,11 @@ export const guestGuard: CanActivateFn = () => {
     return true;
   }
 
-  router.navigate(['/queue']);
+  // Redirect based on user role
+  if (authService.isAdmin()) {
+    router.navigate(['/admin']);
+  } else {
+    router.navigate(['/queue']);
+  }
   return false;
 };
