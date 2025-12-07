@@ -3,10 +3,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.0</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<groupId>dev.woundex</groupId>
+		<artifactId>ticketing_System</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>dev.woundex</groupId>
 	<artifactId>config-server</artifactId>
@@ -27,8 +27,9 @@
 		<url/>
 	</scm>
 	<properties>
-		<java.version>24</java.version>
-		<spring-cloud.version>2025.1.0</spring-cloud.version>
+		<java.version>17</java.version>
+		<spring-cloud.version>2023.0.3</spring-cloud.version>
+
 	</properties>
 	<dependencies>
 		<dependency>
@@ -68,3 +69,4 @@
 	</build>
 
 </project>
+

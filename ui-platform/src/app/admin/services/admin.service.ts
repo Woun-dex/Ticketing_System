@@ -19,7 +19,6 @@ import {
 export class AdminService {
   private readonly API_URL = 'http://localhost:8082/api/v1/admin/events';
   
-  // Signals for reactive state management
   private eventsSignal = signal<Event[]>([]);
   private selectedEventSignal = signal<Event | null>(null);
   private inventorySignal = signal<EventInventoryResponse | null>(null);

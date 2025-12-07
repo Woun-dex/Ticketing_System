@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.1</version>
+        <version>3.3.6</version>
         <relativePath/>
     </parent>
 
@@ -22,6 +22,7 @@
         <module>eureka_server</module>
         <module>gateway</module>
         <module>booking-service</module>
+        <module>admin-service</module>
         <module>auth-service</module>
         <module>payment-service</module>
         <module>search-service</module>
@@ -29,8 +30,9 @@
     </modules>
 
     <properties>
-        <java.version>24</java.version>
-        <spring-cloud.version>2024.0.0</spring-cloud.version>
+        <java.version>17</java.version>
+        <spring-cloud.version>2023.0.3</spring-cloud.version>
+        <lombok.version>1.18.34</lombok.version>
     </properties>
 
     <dependencyManagement>
@@ -49,6 +51,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>

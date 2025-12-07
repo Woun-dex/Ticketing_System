@@ -6,8 +6,7 @@ import { Router } from '@angular/router';
 export interface User {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  username: string;
   role?: string;
 }
 
@@ -104,9 +103,31 @@ export class AuthService {
     return this.tokenSignal();
   }
 
+   /**
+   * Decode JWT payload (base64) without verification.
+   * Used to extract claims like role from the token.
+   */
+  private decodeToken(token: string): any {
+    try {
+      const payload = token.split('.')[1];
+      const decoded = atob(payload);
+      return JSON.parse(decoded);
+    } catch {
+      return null;
+    }
+  }
+
   getUserRole(): string | null {
     const user = this.userSignal();
-    return user?.role || null;
+    if (user?.role) {
+      return user.role;
+    }
+    const token = this.tokenSignal();
+    if (token) {
+      const decoded = this.decodeToken(token);
+      return decoded?.role || null;
+    }
+    return null;
   }
 
   isAdmin(): boolean {

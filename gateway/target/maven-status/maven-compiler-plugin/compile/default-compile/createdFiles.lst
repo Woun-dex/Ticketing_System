@@ -1,0 +1,7 @@
+dev\woundex\gateway\Config\SecurityConfig.class
+dev\woundex\gateway\filter\RequestLoggingFilter.class
+dev\woundex\gateway\Service\QueueFilter.class
+dev\woundex\gateway\Service\QueueWebSocketHandler.class
+dev\woundex\gateway\GatewayApplication.class
+dev\woundex\gateway\Service\QueuePromoter.class
+dev\woundex\gateway\Config\WebSocketConfig.class
