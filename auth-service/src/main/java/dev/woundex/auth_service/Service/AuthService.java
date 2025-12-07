@@ -7,6 +7,7 @@ import dev.woundex.auth_service.dto.LoginRequest;
 import dev.woundex.auth_service.dto.RegisterAdmin;
 import dev.woundex.auth_service.dto.RegisterRequest;
 import dev.woundex.auth_service.dto.UserResponse;
+import io.github.cdimascio.dotenv.Dotenv;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.redis.core.RedisTemplate;
@@ -39,8 +40,7 @@ public class AuthService {
         
         repo.save(user);
 
-        String token = jwtService.getJwtToken(user);
-        return new AuthResponse(token);
+        return getAuthResponse(user);
     }
 
     public AuthResponse login(LoginRequest request){
@@ -50,12 +50,11 @@ public class AuthService {
             throw new RuntimeException("Invalid Credentials!");
         }
 
-        String token = jwtService.getJwtToken(user);
-        return new AuthResponse(token);
+        return getAuthResponse(user);
     }
 
     public AuthResponse registerAdmin(RegisterAdmin request){
-        String adminSecret = System.getProperty("admin.secret");
+        String adminSecret = Dotenv.load().get("admin.secret");
         if ( !request.getAdminSecret().equals(adminSecret) ){
             throw new RuntimeException("Invalid Admin Secret!");
         }
@@ -72,11 +71,10 @@ public class AuthService {
                 .build();
 
         repo.save(user);
-        String token = jwtService.getJwtToken(user);
-        return new AuthResponse(token); 
+        return getAuthResponse(user);
     }
 
- public AuthResponse generateQueueToken(String token , String eventId){
+ public String generateQueueToken(String token , String eventId){
 
         String userEmail = jwtService.extractEmail(token);
         User user = repo.findByEmail(userEmail).orElseThrow(()->new RuntimeException("Invalid Credentials!"));
@@ -90,7 +88,21 @@ public class AuthService {
         }
 
         String shortJwt = jwtService.generateShortLivedToken(user , eventId);
-        return new AuthResponse(shortJwt);
+        return  shortJwt;
+    }
+
+    public AuthResponse getAuthResponse(User user){
+
+        String token = jwtService.getJwtToken(user);
+        UserResponse userResponse = UserResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .username(user.getUsername())
+                .role(user.getRole())
+                .build();
+
+
+        return new AuthResponse(token , userResponse);
     }
 
 }

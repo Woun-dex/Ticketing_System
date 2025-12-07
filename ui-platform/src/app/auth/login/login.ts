@@ -35,7 +35,6 @@ export class Login {
     this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: () => {
         this.isLoading.set(false);
-        // Navigate based on user role
         if (this.authService.isAdmin()) {
           this.router.navigate(['/admin']);
         } else {

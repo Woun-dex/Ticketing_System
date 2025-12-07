@@ -18,14 +18,17 @@ public abstract class QueueFilter implements GlobalFilter, Ordered {
     @Value("${jwt.secret}")
     private String jwtSecret;
 
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
         String path = exchange.getRequest().getURI().getPath();
 
-        if (!path.startsWith("/api/book")) {
+        if (path.startsWith("/api/v1/auth") ) {
             return chain.filter(exchange);
         }
+
+
 
         String token = exchange.getRequest().getHeaders().getFirst("Authorization");
 

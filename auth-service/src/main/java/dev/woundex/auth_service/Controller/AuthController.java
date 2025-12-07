@@ -30,15 +30,13 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(request));
     }
 
-    @GetMapping("/admin")
+    @PostMapping("/admin")
     public ResponseEntity<AuthResponse> registerAdmin(@RequestBody @Valid RegisterAdmin request){
         return ResponseEntity.ok(authService.registerAdmin(request));
     }
-   
-    
 
     @PostMapping("/queue-token")
-    public ResponseEntity<AuthResponse> getQueueToken(
+    public ResponseEntity<String> getQueueToken(
             @RequestHeader("Authorization") String authHeader,
             @RequestParam String eventId
     ){

@@ -6,12 +6,17 @@ export const adminGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  if (authService.isAuthenticated()) {
-    // In a real app, you'd also check for admin role
-    // For now, we just check authentication
-    return true;
+  if (!authService.isAuthenticated()) {
+    router.navigate(['/login']);
+    return false;
   }
 
-  router.navigate(['/login']);
-  return false;
+  // Check for ADMIN role
+  if (!authService.isAdmin()) {
+    console.warn('Access denied: User does not have ADMIN role');
+    router.navigate(['/queue']);
+    return false;
+  }
+
+  return true;
 };
