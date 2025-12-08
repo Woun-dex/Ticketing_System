@@ -1,5 +1,7 @@
 C:\Users\Woundex\Documents\Project\ticketing_System\auth-service\src\main\java\dev\woundex\auth_service\AuthServiceApplication.java
 C:\Users\Woundex\Documents\Project\ticketing_System\auth-service\src\main\java\dev\woundex\auth_service\Config\RedisConfig.java
+C:\Users\Woundex\Documents\Project\ticketing_System\auth-service\src\main\java\dev\woundex\auth_service\Config\SecurityConfig.java
+C:\Users\Woundex\Documents\Project\ticketing_System\auth-service\src\main\java\dev\woundex\auth_service\Controller\AuthClient.java
 C:\Users\Woundex\Documents\Project\ticketing_System\auth-service\src\main\java\dev\woundex\auth_service\Controller\AuthController.java
 C:\Users\Woundex\Documents\Project\ticketing_System\auth-service\src\main\java\dev\woundex\auth_service\dto\AuthResponse.java
 C:\Users\Woundex\Documents\Project\ticketing_System\auth-service\src\main\java\dev\woundex\auth_service\dto\LoginRequest.java

@@ -1,0 +1,38 @@
+-------------------------------------------------------------------------------
+Test set: dev.woundex.booking_service.BoookingConcurrencyTest
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 0.089 s <<< FAILURE! -- in dev.woundex.booking_service.BoookingConcurrencyTest
+dev.woundex.booking_service.BoookingConcurrencyTest.testConcurrentBookings_shouldOnlyAllowCorrectNumberOfBookings -- Time elapsed: 0.014 s <<< ERROR!
+java.lang.Error: 
+Unresolved compilation problems: 
+	Syntax error on token(s), misplaced construct(s)
+	The method thenReturn(RBucket<Object>) in the type OngoingStubbing<RBucket<Object>> is not applicable for the arguments (RBucket<String>)
+	The method findAllBySeatIds(anyList()) is undefined for the type SeatRepository
+	The constructor SeatType() is undefined
+	The constructor SeatType() is undefined
+	The type BoookingConcurrencyTest is already defined
+
+	at dev.woundex.booking_service.BoookingConcurrencyTest.<init>(BoookingConcurrencyTest.java:1)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:502)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+dev.woundex.booking_service.BoookingConcurrencyTest.testConcurrentBookings_multipleSeatsPerUser -- Time elapsed: 0.003 s <<< ERROR!
+java.lang.Error: 
+Unresolved compilation problems: 
+	Syntax error on token(s), misplaced construct(s)
+	The method thenReturn(RBucket<Object>) in the type OngoingStubbing<RBucket<Object>> is not applicable for the arguments (RBucket<String>)
+	The method findAllBySeatIds(anyList()) is undefined for the type SeatRepository
+	The constructor SeatType() is undefined
+	The constructor SeatType() is undefined
+	The type BoookingConcurrencyTest is already defined
+
+	at dev.woundex.booking_service.BoookingConcurrencyTest.<init>(BoookingConcurrencyTest.java:1)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:502)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
