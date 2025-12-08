@@ -10,7 +10,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BookResponse {
+
     private UUID orderId;
-    private int expiresInSeconds;
-    private String message;
+    private String status;
 }

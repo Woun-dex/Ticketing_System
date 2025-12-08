@@ -135,7 +135,6 @@ public class AdminEventService {
         Seat seat = seatRepository.findById(seatId)
                 .orElseThrow(() -> new RuntimeException("Seat not found"));
 
-        // Validation: Don't mess with sold seats
         if (seat.getStatus() == SeatStatus.SOLD) {
             throw new IllegalStateException("Cannot edit a SOLD seat");
         }

@@ -1,6 +1,5 @@
 C:\Users\Woundex\Documents\Project\ticketing_System\admin-service\src\main\java\dev\woundex\admin_service\AdminServiceApplication.java
 C:\Users\Woundex\Documents\Project\ticketing_System\admin-service\src\main\java\dev\woundex\admin_service\Config\KafkaConfig.java
-C:\Users\Woundex\Documents\Project\ticketing_System\admin-service\src\main\java\dev\woundex\admin_service\Config\SecurityConfig.java
 C:\Users\Woundex\Documents\Project\ticketing_System\admin-service\src\main\java\dev\woundex\admin_service\controller\AdminEventController.java
 C:\Users\Woundex\Documents\Project\ticketing_System\admin-service\src\main\java\dev\woundex\admin_service\dto\EventInventoryResponse.java
 C:\Users\Woundex\Documents\Project\ticketing_System\admin-service\src\main\java\dev\woundex\admin_service\dto\EventLifecycleMessage.java
@@ -18,4 +17,6 @@ C:\Users\Woundex\Documents\Project\ticketing_System\admin-service\src\main\java\
 C:\Users\Woundex\Documents\Project\ticketing_System\admin-service\src\main\java\dev\woundex\admin_service\Repository\SeatRepository.java
 C:\Users\Woundex\Documents\Project\ticketing_System\admin-service\src\main\java\dev\woundex\admin_service\Repository\SeatTypeRepository.java
 C:\Users\Woundex\Documents\Project\ticketing_System\admin-service\src\main\java\dev\woundex\admin_service\security\JwtAuthenticationFilter.java
+C:\Users\Woundex\Documents\Project\ticketing_System\admin-service\src\main\java\dev\woundex\admin_service\security\JwtService.java
+C:\Users\Woundex\Documents\Project\ticketing_System\admin-service\src\main\java\dev\woundex\admin_service\security\SecurityConfig.java
 C:\Users\Woundex\Documents\Project\ticketing_System\admin-service\src\main\java\dev\woundex\admin_service\service\AdminEventService.java
