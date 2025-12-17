@@ -8,9 +8,10 @@
 		<groupId>dev.woundex</groupId>
 		<artifactId>ticketing_System</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<artifactId>common-module</artifactId>
+	<artifactId>core</artifactId>
 	<packaging>jar</packaging>
 
 	<name>common-module</name>

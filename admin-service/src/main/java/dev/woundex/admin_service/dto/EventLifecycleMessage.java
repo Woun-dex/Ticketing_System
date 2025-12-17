@@ -2,12 +2,14 @@ package dev.woundex.admin_service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-public  class EventLifecycleMessage {
-    private String action;
+@NoArgsConstructor
+public class EventLifecycleMessage {
+    private String type;
     private Long eventId;
-    private String eventName;
-    private int inventoryCount;
+    private String name;
+    private Integer totalInventory;
 }
