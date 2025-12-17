@@ -44,5 +44,10 @@ public class AuthController {
         return ResponseEntity.ok(authService.generateQueueToken(token , eventId));
     }
 
+    @PostMapping("/validate")
+    public ResponseEntity<dev.woundex.auth_service.dto.UserResponse> validateToken(@RequestBody String token){
+        return ResponseEntity.ok(authService.validateToken(token));
+    }
+
 
 }

@@ -1,17 +1,17 @@
 package dev.woundex.booking_service.service;
 
-import dev.woundex.admin_service.Entity.Seat;
-import dev.woundex.admin_service.Enum.SeatStatus;
-import dev.woundex.admin_service.Repository.SeatRepository;
-import dev.woundex.auth_service.Controller.AuthClient;
-import dev.woundex.auth_service.Entities.User;
-import dev.woundex.auth_service.dto.UserResponse;
+import dev.woundex.booking_service.Entity.Seat;
+import dev.woundex.booking_service.Enum.SeatStatus;
+import dev.woundex.booking_service.Repository.SeatRepository;
+import dev.woundex.booking_service.client.AuthClient;
+import dev.woundex.booking_service.dto.UserResponse;
 import dev.woundex.booking_service.Entity.Order;
 import dev.woundex.booking_service.Entity.OrderStatus;
 import dev.woundex.booking_service.Repository.OrderRepository;
 import dev.woundex.booking_service.dto.BookRequest;
 import dev.woundex.booking_service.dto.BookResponse;
 import dev.woundex.booking_service.dto.OrderCreatedEvent;
+import dev.woundex.booking_service.dto.TicketReservedEvent;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RLock;
@@ -47,18 +47,26 @@ public class BookingService {
 
     @Transactional
     public BookResponse createBooking(BookRequest req , String jwt){
-
-        UserResponse user = authClient.validateToken(jwt);
+        // Strip "Bearer " prefix if present
+        String token = jwt.startsWith("Bearer ") ? jwt.substring(7) : jwt;
+        UserResponse user = authClient.validateToken(token);
 
         Long eventId = req.getEventId();
         List<Long> seatIds = req.getSeatIds();
         UUID userId = user.getId();
 
+        // Initialize Redis inventory from database if not exists
+        String inventoryKey = "tickets:available:" + eventId;
+        if (!redisson.getBucket(inventoryKey).isExists()) {
+            int availableSeats = seatRepository.countByEventIdAndStatus(eventId, SeatStatus.AVAILABLE);
+            redisson.getAtomicLong(inventoryKey).set(availableSeats);
+        }
+
         Long stockResult = redisson.getScript(StringCodec.INSTANCE).eval(
             RScript.Mode.READ_WRITE,
             DECREMENT_SCRIPT,
             RScript.ReturnType.INTEGER,
-            Collections.singletonList("tickets:available:" + eventId),
+            Collections.singletonList(inventoryKey),
             seatIds.size()
         );
 
@@ -72,20 +80,18 @@ public class BookingService {
         }
 
         RLock multiLock = redisson.getMultiLock(locks.toArray(new RLock[0]));
+        boolean lockAcquired = false;
 
         try {
-            // Try to acquire lock. Wait up to 2 seconds. Hold for 10 seconds.
-            boolean isLocked = multiLock.tryLock(2, 10, TimeUnit.SECONDS);
+            lockAcquired = multiLock.tryLock(2, 10, TimeUnit.SECONDS);
 
-            if (!isLocked) {
-                // FAILED to lock. We must ROLLBACK the Lua decrement we did in Step 1.
+            if (!lockAcquired) {
                 redisson.getAtomicLong("tickets:available:" + eventId).addAndGet(seatIds.size());
                 throw new RuntimeException("Seats are currently being booked by someone else.");
             }
 
             List<Seat> seats = seatRepository.findAllBySeatIds(seatIds);
             
-            // Verify they are actually AVAILABLE (Defense in Depth)
             for (Seat seat : seats) {
                 if (seat.getStatus() != SeatStatus.AVAILABLE) {
                     redisson.getAtomicLong("tickets:available:" + eventId).addAndGet(seatIds.size());
@@ -99,19 +105,23 @@ public class BookingService {
                     .status(OrderStatus.PENDING)
                     .totalAmount(calculateTotal(seats))
                     .createdAt(LocalDateTime.now())
+                    .seatIds(seatIds)
                     .build();
             orderRepository.save(order);
 
             for (Seat seat : seats) {
                 seat.setStatus(SeatStatus.RESERVED);
-                // JPA will check @Version here automatically
             }
             seatRepository.saveAll(seats);
 
             redisson.getBucket("order_expiry:" + order.getId())
                     .set("PENDING", 5, TimeUnit.MINUTES);
 
+            // Publish order created event for payment service
             kafkaTemplate.send("orders.topic", new OrderCreatedEvent(order.getId(), userId, order.getTotalAmount()));
+            
+            // Publish ticket reserved event for search service
+            kafkaTemplate.send("ticket-reserved", new TicketReservedEvent(order.getId(), eventId, seatIds, userId));
 
             return new BookResponse(order.getId(), "RESERVED_WAITING_PAYMENT");
 
@@ -120,7 +130,7 @@ public class BookingService {
             redisson.getAtomicLong("tickets:available:" + eventId).addAndGet(seatIds.size());
             throw new RuntimeException("System Error during locking");
         } finally {
-            if (multiLock.isHeldByCurrentThread()) {
+            if (lockAcquired) {
                 multiLock.unlock();
             }
         }

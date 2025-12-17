@@ -5,6 +5,7 @@ C:\Users\Woundex\Documents\Project\ticketing_System\admin-service\src\main\java\
 C:\Users\Woundex\Documents\Project\ticketing_System\admin-service\src\main\java\dev\woundex\admin_service\dto\EventLifecycleMessage.java
 C:\Users\Woundex\Documents\Project\ticketing_System\admin-service\src\main\java\dev\woundex\admin_service\dto\EventRequest.java
 C:\Users\Woundex\Documents\Project\ticketing_System\admin-service\src\main\java\dev\woundex\admin_service\dto\SeatGenerationRequest.java
+C:\Users\Woundex\Documents\Project\ticketing_System\admin-service\src\main\java\dev\woundex\admin_service\dto\SeatIndexMessage.java
 C:\Users\Woundex\Documents\Project\ticketing_System\admin-service\src\main\java\dev\woundex\admin_service\dto\SeatResponse.java
 C:\Users\Woundex\Documents\Project\ticketing_System\admin-service\src\main\java\dev\woundex\admin_service\dto\SeatTypeRequest.java
 C:\Users\Woundex\Documents\Project\ticketing_System\admin-service\src\main\java\dev\woundex\admin_service\Entity\Event.java

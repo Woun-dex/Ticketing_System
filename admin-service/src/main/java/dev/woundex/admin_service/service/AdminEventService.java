@@ -89,7 +89,8 @@ public class AdminEventService {
             throw new IllegalStateException("Event must be DRAFT to publish");
         }
 
-        int totalSeats = seatRepository.countByEventId(eventId);
+        List<Seat> seats = seatRepository.findByEventId(eventId);
+        int totalSeats = seats.size();
         if (totalSeats == 0) {
             throw new IllegalStateException("Cannot publish event with 0 seats");
         }
@@ -97,7 +98,22 @@ public class AdminEventService {
         event.setStatus(EventStatus.PUBLISHED);
         eventRepository.save(event);
 
+        // Send event published message
         kafkaProducer.sendEventPublished(event.getId(), event.getName(), totalSeats);
+
+        // Send seats for indexing in Elasticsearch
+        List<SeatIndexMessage> seatMessages = seats.stream()
+                .map(seat -> SeatIndexMessage.builder()
+                        .id(seat.getId())
+                        .eventId(event.getId())
+                        .rowNumber(seat.getRowNumber())
+                        .seatNumber(seat.getSeatNumber())
+                        .status(seat.getStatus().name())
+                        .seatTypeName(seat.getSeatType().getName())
+                        .price(seat.getSeatType().getPrice())
+                        .build())
+                .toList();
+        kafkaProducer.sendSeatsForIndexing(seatMessages);
     }
 
     public EventInventoryResponse getEventInventory(Long eventId) {

@@ -105,4 +105,10 @@ public class AuthService {
         return new AuthResponse(token , userResponse);
     }
 
+    public UserResponse validateToken(String token){
+        // Strip "Bearer " prefix if present
+        String cleanToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+        return jwtService.validateShortJwt(cleanToken);
+    }
+
 }
