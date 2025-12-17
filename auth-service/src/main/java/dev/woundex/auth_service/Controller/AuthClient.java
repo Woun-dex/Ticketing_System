@@ -1,26 +1,17 @@
 package dev.woundex.auth_service.Controller;
 
 
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties.Jwt;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import dev.woundex.auth_service.Service.JwtService;
 import dev.woundex.auth_service.dto.UserResponse;
-import lombok.RequiredArgsConstructor;
 
-@FeignClient(name = "auth-service" , url = "http://localhost:8081" , path = "/api/users" )
-@RequiredArgsConstructor
-public class AuthClient {
-
-    private final JwtService jwtService;
-
+@FeignClient(name = "auth-service", path = "/api/v1/auth")
+public interface AuthClient {
 
     @PostMapping("/validate")
-    public UserResponse validateToken(@RequestBody String token){
-    return jwtService.validateShortJwt(token);
-    }
+    UserResponse validateToken(@RequestBody String token);
 
     
 }

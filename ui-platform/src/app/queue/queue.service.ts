@@ -7,8 +7,8 @@ import { Observable, Subject } from "rxjs";
 })
 export class QueueService {
 
+    private readonly GATEWAY_URL = 'http://localhost:8080';
     private wsUrl = 'ws://localhost:8080/ws/queue';
-    private authUrl = 'http://localhost:8080/api/v1/auth/queue-token';
 
     constructor(private http: HttpClient) { }
 
@@ -39,7 +39,6 @@ export class QueueService {
 
     getBookingToken(loginToken: string , eventId : string) : Observable<any> {
         const headers = new HttpHeaders().set('Authorization', `Bearer ${loginToken}`);
-        return this.http.get<any>(this.authUrl + `?eventId=${eventId}`, { headers });
-
+        return this.http.post<any>(`${this.GATEWAY_URL}/api/v1/auth/queue-token?eventId=${eventId}`, {}, { headers });
     }
 }

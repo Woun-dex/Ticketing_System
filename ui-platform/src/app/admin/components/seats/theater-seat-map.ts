@@ -34,6 +34,7 @@ interface SeatGroup {
 export class TheaterSeatMap {
   @Input() seats: Seat[] = [];
   @Input() selectedSeatId: number | null = null;
+  @Input() selectedSeatIds: number[] = []; // Support multiple selection
   @Input() editMode = false;
   
   @Output() seatClick = new EventEmitter<Seat>();
@@ -124,7 +125,8 @@ export class TheaterSeatMap {
   }
 
   getSeatClass(seat: Seat): string {
-    const isSelected = this.selectedSeatId === seat.id;
+    // Check both single selection and multiple selection
+    const isSelected = this.selectedSeatId === seat.id || this.selectedSeatIds.includes(seat.id);
     
     const baseClasses = 'text-white';
     

@@ -1,8 +1,9 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { QueueService } from './queue.service';
 import { AuthService } from '../services/auth.service';
+import { SearchService } from '../services/search.service';
 
 @Component({
   selector: 'app-queue',
@@ -11,8 +12,9 @@ import { AuthService } from '../services/auth.service';
   templateUrl: './queue.html',
   styleUrl: './queue.css',
 })
-export class Queue implements OnInit {
-  eventId = 'event123';
+export class Queue implements OnInit, OnDestroy {
+  eventId = signal<string>('');
+  eventName = signal<string>('Loading...');
   
   status = signal<'IDLE' | 'WAITING' | 'PROMOTED' | 'BOOKING'>('IDLE');
   queuePosition = signal<number | null>(null);
@@ -23,22 +25,50 @@ export class Queue implements OnInit {
   userId = computed(() => this.user()?.id || 'user_' + Math.floor(Math.random() * 1000));
 
   constructor(
+    private route: ActivatedRoute,
     private queueService: QueueService,
     private authService: AuthService,
+    private searchService: SearchService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     if (!this.authService.isAuthenticated()) {
       this.router.navigate(['/login']);
+      return;
     }
+
+    this.route.params.subscribe(params => {
+      const eventId = params['eventId'];
+      if (eventId) {
+        this.eventId.set(eventId);
+        this.loadEventDetails(eventId);
+      } else {
+        this.router.navigate(['/events']);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    // Cleanup WebSocket if needed
+  }
+
+  loadEventDetails(eventId: string): void {
+    this.searchService.searchByEventId(parseInt(eventId)).subscribe({
+      next: (response) => {
+        this.eventName.set(response.eventName);
+      },
+      error: () => {
+        this.eventName.set('Event');
+      }
+    });
   }
 
   joinQueue(): void {
     this.status.set('WAITING');
     this.errorMsg.set(null);
 
-    this.queueService.connectToQueue(this.eventId, this.userId()).subscribe({
+    this.queueService.connectToQueue(this.eventId(), this.userId()).subscribe({
       next: (data) => {
         console.log('Received data:', data);
 
@@ -46,7 +76,8 @@ export class Queue implements OnInit {
           this.queuePosition.set(data.position);
         }
 
-        if (data.status === 'PROMOTED' || (this.queuePosition() !== null && this.queuePosition()! <= 0)) {
+        // Only handle promotion when server explicitly says PROMOTED
+        if (data.status === 'PROMOTED') {
           this.handlePromotion();
         }
       },
@@ -67,7 +98,7 @@ export class Queue implements OnInit {
       return;
     }
 
-    this.queueService.getBookingToken(token, this.eventId).subscribe({
+    this.queueService.getBookingToken(token, this.eventId()).subscribe({
       next: (response) => {
         this.bookingToken.set(response.bookingToken);
         this.status.set('BOOKING');
@@ -78,6 +109,16 @@ export class Queue implements OnInit {
         console.error('Error fetching booking token:', err);
       },
     });
+  }
+
+  goToSeatSelection(): void {
+    this.router.navigate(['/seats', this.eventId()], {
+      queryParams: { token: this.bookingToken() }
+    });
+  }
+
+  goBack(): void {
+    this.router.navigate(['/events']);
   }
 
   logout(): void {
