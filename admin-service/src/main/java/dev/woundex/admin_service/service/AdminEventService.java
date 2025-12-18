@@ -200,11 +200,13 @@ public class AdminEventService {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
-        if (event.getStatus() == EventStatus.PUBLISHED) {
-            throw new IllegalStateException("Cannot delete a published event");
-        }
+        // Delete order seats first (due to foreign key constraint)
+        eventRepository.deleteOrderSeatsByEventId(eventId);
+        
+        // Delete orders for this event
+        eventRepository.deleteOrdersByEventId(eventId);
 
-        // Delete all seats first
+        // Delete all seats
         seatRepository.deleteByEventId(eventId);
         
         // Delete all seat types
@@ -212,6 +214,9 @@ public class AdminEventService {
         
         // Delete the event
         eventRepository.delete(event);
+        
+        // Send event deleted message to remove from Elasticsearch
+        kafkaProducer.sendEventDeleted(eventId, event.getName());
     }
 
     @Transactional

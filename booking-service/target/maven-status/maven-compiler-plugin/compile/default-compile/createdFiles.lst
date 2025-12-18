@@ -24,6 +24,7 @@ dev\woundex\booking_service\Entity\Seat$SeatBuilder.class
 dev\woundex\booking_service\dto\TicketReservedEvent.class
 dev\woundex\booking_service\Entity\SeatType$SeatTypeBuilder.class
 dev\woundex\booking_service\Enum\SeatStatus.class
+dev\woundex\booking_service\config\MetricsConfig.class
 dev\woundex\booking_service\Entity\OrderStatus.class
 dev\woundex\booking_service\dto\BookResponse.class
 dev\woundex\booking_service\Entity\Event.class

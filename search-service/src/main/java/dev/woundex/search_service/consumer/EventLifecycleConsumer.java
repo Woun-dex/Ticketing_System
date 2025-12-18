@@ -38,6 +38,9 @@ public class EventLifecycleConsumer {
                 case "CANCELLED":
                     handleEventCancelled(message);
                     break;
+                case "DELETED":
+                    handleEventDeleted(message);
+                    break;
                 default:
                     log.warn("Unknown event type: {}", type);
             }
@@ -82,5 +85,10 @@ public class EventLifecycleConsumer {
         
         searchService.indexEvent(event);
         log.info("Marked event as cancelled: {}", message.getEventId());
+    }
+    
+    private void handleEventDeleted(EventLifecycleMessage message) {
+        searchService.deleteEvent(message.getEventId());
+        log.info("Deleted event from Elasticsearch: {}", message.getEventId());
     }
 }

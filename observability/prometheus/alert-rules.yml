@@ -1,0 +1,112 @@
+groups:
+  - name: ticketing-system-alerts
+    rules:
+      # High Error Rate
+      - alert: HighErrorRate
+        expr: rate(http_server_requests_seconds_count{status=~"5.."}[5m]) / rate(http_server_requests_seconds_count[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate on {{ $labels.instance }}"
+          description: "Error rate is {{ $value | humanizePercentage }} on {{ $labels.instance }}"
+
+      # High Response Time (P99 > 2s)
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.99, rate(http_server_requests_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High P99 response time on {{ $labels.instance }}"
+          description: "P99 response time is {{ $value }}s on {{ $labels.instance }}"
+
+      # Booking Service Lock Failures
+      - alert: HighLockFailureRate
+        expr: rate(booking_lock_failures_total[5m]) > 10
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High lock failure rate in booking service"
+          description: "Lock failures: {{ $value }}/s in the last 5 minutes"
+
+      # Queue Length Too High
+      - alert: QueueLengthHigh
+        expr: booking_queue_length > 10000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Queue length is very high"
+          description: "Current queue length: {{ $value }}"
+
+      # Reservation TTL Expirations High
+      - alert: HighReservationExpirations
+        expr: rate(booking_reservation_expirations_total[5m]) > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High reservation expiration rate"
+          description: "Reservation expirations: {{ $value }}/s"
+
+      # Redis Down
+      - alert: RedisDown
+        expr: redis_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis is down"
+          description: "Redis instance {{ $labels.instance }} is down"
+
+      # Kafka Consumer Lag
+      - alert: KafkaConsumerLag
+        expr: kafka_consumer_group_lag > 10000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High Kafka consumer lag"
+          description: "Consumer group {{ $labels.consumergroup }} has lag of {{ $value }}"
+
+      # PostgreSQL Connections High
+      - alert: PostgreSQLConnectionsHigh
+        expr: pg_stat_activity_count > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "PostgreSQL connections are high"
+          description: "Current connections: {{ $value }}"
+
+      # Service Down
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service {{ $labels.job }} is down"
+          description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minute"
+
+      # JVM Heap Usage High
+      - alert: JVMHeapUsageHigh
+        expr: jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"} > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "JVM heap usage is high on {{ $labels.instance }}"
+          description: "JVM heap usage is {{ $value | humanizePercentage }}"
+
+      # Redis Memory Usage High
+      - alert: RedisMemoryHigh
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis memory usage is high"
+          description: "Redis memory usage is {{ $value | humanizePercentage }}"

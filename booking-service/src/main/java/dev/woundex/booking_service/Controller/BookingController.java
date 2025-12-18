@@ -1,11 +1,7 @@
 package dev.woundex.booking_service.Controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import dev.woundex.booking_service.dto.BookRequest;
 import dev.woundex.booking_service.dto.BookResponse;
@@ -23,6 +19,12 @@ public class BookingController {
     public ResponseEntity<BookResponse> book(@RequestBody BookRequest req , @RequestHeader("Authorization") String jwt){
         BookResponse response = bookingService.createBooking(req,jwt);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/orders/{id}")
+    public ResponseEntity<BookResponse> getOrder(@PathVariable String id){
+        BookResponse response = bookingService.getOrder(id);
+        return ResponseEntity.ok(response); 
     }
     
 }

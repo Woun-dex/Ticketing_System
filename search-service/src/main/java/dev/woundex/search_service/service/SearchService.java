@@ -99,6 +99,17 @@ public class SearchService {
         log.info("Indexed event: {}", event.getId());
     }
     
+    public void deleteEvent(Long eventId) {
+        // Delete all seats for this event first
+        List<SeatDocument> seats = seatSearchRepository.findByEventId(eventId);
+        seatSearchRepository.deleteAll(seats);
+        log.info("Deleted {} seats for event: {}", seats.size(), eventId);
+        
+        // Delete the event document
+        eventSearchRepository.deleteById(eventId.toString());
+        log.info("Deleted event from index: {}", eventId);
+    }
+    
     public void indexSeat(SeatDocument seat) {
         seatSearchRepository.save(seat);
         log.info("Indexed seat: {}", seat.getId());

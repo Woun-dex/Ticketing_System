@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,6 +30,8 @@ public class Order {
     private Long eventId;
     private BigDecimal totalAmount;
     @Enumerated(EnumType.STRING)
+    @Column(name = "status", columnDefinition = "order_status")
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private OrderStatus status;
     private LocalDateTime createdAt;
     

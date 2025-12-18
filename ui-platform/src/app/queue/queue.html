@@ -1,80 +1,89 @@
-<div class="min-h-screen bg-[#1e1e1e] flex items-center justify-center p-4">
-  <div class="max-w-2xl w-full">
-    <div class="flex justify-between items-center mb-6">
+<div class="page-gradient-radial p-4 md:p-8">
+  <div class="max-w-2xl mx-auto">
+    <!-- Navigation Header -->
+    <nav class="flex justify-between items-center mb-8 fade-in">
       <button 
         (click)="goBack()"
-        class="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all duration-200 border border-white/20">
-        ← Back
+        class="btn-ghost">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Back
       </button>
-      <div class="text-white">
+      <div class="text-right">
         @if (user()) {
-          <p class="text-sm text-purple-200">Welcome back,</p>
-          <p class="font-semibold">{{ user()?.username }} </p>
+          <p class="text-sm text-gray-400">Welcome back,</p>
+          <p class="font-semibold text-white">{{ user()?.username }}</p>
         }
       </div>
       <button 
         (click)="logout()"
-        class="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all duration-200 border border-white/20">
+        class="btn-ghost">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
         </svg>
         Logout
       </button>
-    </div>
+    </nav>
 
-   <div class="text-center mb-8">
-      <h1 class="text-4xl md:text-5xl font-bold text-white mb-2 drop-shadow-lg">
+    <!-- Event Header -->
+    <div class="text-center mb-8 slide-up">
+      <h1 class="text-4xl md:text-5xl font-bold text-white mb-3">
         {{ eventName() }}
       </h1>
-      <p class="text-purple-200 text-sm">Secure your tickets now</p>
+      <p class="text-gray-400">Secure your tickets now</p>
     </div>
 
+    <!-- IDLE State - Join Queue Card -->
     @if (status() === 'IDLE') {
-      <div class="bg-white rounded-2xl shadow-2xl p-8 md:p-12 transform hover:scale-105 transition-transform duration-300">
-        <div class="text-center">
-          <div class="mb-6">
-            <svg class="w-20 h-20 mx-auto text-[#fcc200]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="glass-card p-8 md:p-12 text-center slide-up">
+        <div class="mb-6">
+          <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl shadow-lg mb-4">
+            <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
             </svg>
           </div>
-          <p class="text-gray-600 mb-6">
-            User ID: <span class="font-mono font-semibold text-[#fcc200]">{{ userId() }}</span>
-          </p>
-          <button 
-            (click)="joinQueue()"
-            class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-10 py-4 rounded-full font-semibold text-lg shadow-lg hover:from-yellow-500 hover:to-orange-600 transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-yellow-300">
-            Join Queue
-          </button>
         </div>
+        <p class="text-gray-400 mb-6">
+          User ID: <span class="font-mono font-semibold text-amber-400">{{ userId() }}</span>
+        </p>
+        <button 
+          (click)="joinQueue()"
+          class="btn-accent px-10 py-4 text-lg">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+          </svg>
+          Join Queue
+        </button>
       </div>
     }
 
     <!-- WAITING State -->
     @if (status() === 'WAITING') {
-      <div class="bg-white rounded-2xl shadow-2xl p-8 md:p-12">
+      <div class="glass-card p-8 md:p-12 slide-up">
         <div class="text-center">
-          <h2 class="text-3xl font-bold text-gray-800 mb-6">You're in line</h2>
+          <h2 class="text-3xl font-bold text-white mb-6">You're in line</h2>
           
           <!-- Queue Position Circle -->
           <div class="relative inline-block mb-6">
-            <div class="w-48 h-48 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-xl animate-pulse">
-              <div class="bg-white w-40 h-40 rounded-full flex items-center justify-center">
-                <span class="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-orange-600">
+            <div class="w-48 h-48 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-2xl pulse-accent">
+              <div class="bg-gray-900 w-40 h-40 rounded-full flex items-center justify-center border-4 border-gray-800">
+                <span class="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">
                   {{ queuePosition() !== null ? queuePosition() : '...' }}
                 </span>
               </div>
             </div>
           </div>
 
-          <p class="text-xl text-gray-700 mb-2">
+          <p class="text-xl text-gray-300 mb-2">
             @if (queuePosition() !== null && queuePosition()! > 0) {
-              <span class="font-semibold">{{ queuePosition() }}</span> {{ queuePosition() === 1 ? 'person' : 'people' }} ahead of you
+              <span class="font-semibold text-white">{{ queuePosition() }}</span> {{ queuePosition() === 1 ? 'person' : 'people' }} ahead of you
             } @else {
               Calculating your position...
             }
           </p>
-          <p class="text-gray-500 text-sm flex items-center justify-center gap-2">
-            <svg class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+          <p class="text-gray-500 text-sm flex items-center justify-center gap-2 mb-6">
+            <svg class="w-5 h-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
             </svg>
             Do not refresh the page
@@ -82,14 +91,17 @@
 
           <!-- Show Proceed Button when position < 50 -->
           @if (queuePosition() !== null && queuePosition()! < 50) {
-            <div class="mt-6 p-4 bg-green-50 rounded-xl border-2 border-green-200">
-              <p class="text-green-700 font-semibold mb-3">
+            <div class="mt-6 p-4 rounded-xl" style="background: var(--color-success-bg); border: 1px solid rgba(34, 197, 94, 0.3);">
+              <p class="text-emerald-400 font-semibold mb-3">
                 🎉 You're within the first 50! You can now select your seats.
               </p>
               <button 
                 (click)="goToSeatSelection()"
-                class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-3 rounded-full font-semibold text-lg shadow-lg hover:from-green-600 hover:to-emerald-700 transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-green-300">
-                Proceed to Seat Selection →
+                class="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-xl font-semibold shadow-lg transform hover:scale-105 transition-all duration-200">
+                Proceed to Seat Selection
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
               </button>
             </div>
           } @else {
@@ -97,7 +109,7 @@
             <div class="mt-8">
               <div class="flex justify-center gap-2">
                 @for (dot of [1, 2, 3]; track dot) {
-                  <div class="w-3 h-3 bg-purple-600 rounded-full animate-bounce" [style.animation-delay]="dot * 0.1 + 's'"></div>
+                  <div class="w-3 h-3 bg-indigo-500 rounded-full animate-bounce" [style.animation-delay]="dot * 0.1 + 's'"></div>
                 }
               </div>
             </div>
@@ -108,19 +120,21 @@
 
     <!-- PROMOTED State -->
     @if (status() === 'PROMOTED') {
-      <div class="bg-white rounded-2xl shadow-2xl p-8 md:p-12">
+      <div class="glass-card p-8 md:p-12 slide-up">
         <div class="text-center">
           <div class="mb-6">
-            <svg class="w-20 h-20 mx-auto text-green-500 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-full shadow-lg animate-bounce">
+              <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
           </div>
-          <h2 class="text-3xl font-bold text-green-600 mb-4">You're In!</h2>
-          <p class="text-gray-600">Securing your access token...</p>
+          <h2 class="text-3xl font-bold text-emerald-400 mb-4">You're In!</h2>
+          <p class="text-gray-400">Securing your access token...</p>
           
           <!-- Loading Spinner -->
           <div class="mt-6">
-            <div class="inline-block w-12 h-12 border-4 border-green-200 border-t-green-600 rounded-full animate-spin"></div>
+            <div class="spinner mx-auto"></div>
           </div>
         </div>
       </div>
@@ -128,34 +142,37 @@
 
     <!-- BOOKING State -->
     @if (status() === 'BOOKING') {
-      <div class="bg-white rounded-2xl shadow-2xl p-8 md:p-12">
+      <div class="glass-card p-8 md:p-12 slide-up">
         <div class="text-center">
           <div class="mb-6">
             <div class="text-6xl mb-4">🎟️</div>
           </div>
-          <h2 class="text-3xl font-bold text-green-600 mb-4">Access Granted!</h2>
-          <p class="text-gray-700 mb-6">You have <span class="font-bold text-red-600">5 minutes</span> to complete your purchase.</p>
+          <h2 class="text-3xl font-bold text-emerald-400 mb-4">Access Granted!</h2>
+          <p class="text-gray-300 mb-6">You have <span class="font-bold text-red-400">5 minutes</span> to complete your purchase.</p>
           
           <!-- Booking Token -->
-          <div class="mb-6">
-            <label class="block text-sm font-semibold text-gray-700 mb-2">Your Booking Token:</label>
+          <div class="mb-6 text-left">
+            <label class="block text-sm font-semibold text-gray-400 mb-2">Your Booking Token:</label>
             <textarea 
               readonly 
               rows="4"
-              class="w-full p-4 bg-gray-50 border-2 border-gray-200 rounded-lg font-mono text-sm text-gray-800 resize-none focus:outline-none focus:border-purple-500"
+              class="w-full p-4 bg-gray-800/50 border border-gray-700 rounded-xl font-mono text-sm text-gray-300 resize-none focus:outline-none focus:border-indigo-500"
               >{{ bookingToken() }}</textarea>
           </div>
 
           <button 
             (click)="goToSeatSelection()"
-            class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:from-green-600 hover:to-emerald-700 transform hover:scale-105 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-green-300">
-            Go to Seat Selection →
+            class="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-xl font-semibold text-lg shadow-lg transform hover:scale-105 transition-all duration-200">
+            Go to Seat Selection
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
           </button>
 
           <!-- Timer Bar -->
           <div class="mt-6">
-            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div class="h-full bg-gradient-to-r from-red-500 to-yellow-500 rounded-full animate-pulse"></div>
+            <div class="h-2 bg-gray-800 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-red-500 to-amber-500 rounded-full animate-pulse" style="width: 100%;"></div>
             </div>
           </div>
         </div>
@@ -164,12 +181,12 @@
 
     <!-- Error Message -->
     @if (errorMsg()) {
-      <div class="mt-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-lg">
-        <div class="flex items-center">
-          <svg class="w-6 h-6 text-red-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+      <div class="mt-6 glass-card p-4" style="background: var(--color-error-bg); border: 1px solid rgba(239, 68, 68, 0.3);">
+        <div class="flex items-center gap-3">
+          <svg class="w-6 h-6 text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
           </svg>
-          <p class="text-red-800 font-medium">{{ errorMsg() }}</p>
+          <p class="text-red-400 font-medium">{{ errorMsg() }}</p>
         </div>
       </div>
     }

@@ -34,8 +34,8 @@ export class AdminDashboard implements OnInit {
 
   getStatusClass(status: EventStatus): string {
     const classes: Record<string, string> = {
-      'DRAFT': 'bg-yellow-500/20 text-yellow-400',
-      'PUBLISHED': 'bg-green-500/20 text-green-400',
+      'DRAFT': 'bg-amber-500/20 text-amber-400',
+      'PUBLISHED': 'bg-emerald-500/20 text-emerald-400',
       'ARCHIVED': 'bg-gray-500/20 text-gray-400',
       'CANCELLED': 'bg-red-500/20 text-red-400'
     };
@@ -44,10 +44,10 @@ export class AdminDashboard implements OnInit {
 
   getEventTypeClass(type: string): string {
     const classes: Record<string, string> = {
-      'concert': 'bg-purple-500/20 text-purple-400',
-      'sports': 'bg-green-500/20 text-green-400',
-      'theater': 'bg-pink-500/20 text-pink-400',
-      'conference': 'bg-blue-500/20 text-blue-400'
+      'concert': 'bg-indigo-500/20 text-indigo-400',
+      'sports': 'bg-emerald-500/20 text-emerald-400',
+      'theater': 'bg-purple-500/20 text-purple-400',
+      'conference': 'bg-sky-500/20 text-sky-400'
     };
     return classes[type.toLowerCase()] || 'bg-gray-500/20 text-gray-400';
   }

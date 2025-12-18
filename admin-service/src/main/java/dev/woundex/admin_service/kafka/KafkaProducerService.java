@@ -36,6 +36,12 @@ public class KafkaProducerService {
         log.info("Sent CANCELLED event for id: {}, message: {}", eventId, message);
     }
 
+    public void sendEventDeleted(Long eventId, String name) {
+        EventLifecycleMessage message = new EventLifecycleMessage("DELETED", eventId, name, 0);
+        kafkaTemplate.send(EVENTS_TOPIC, eventId.toString(), message);
+        log.info("Sent DELETED event for id: {}, message: {}", eventId, message);
+    }
+
     public void sendSeatsForIndexing(List<SeatIndexMessage> seats) {
         for (SeatIndexMessage seat : seats) {
             kafkaTemplate.send(SEATS_TOPIC, seat.getId().toString(), seat);

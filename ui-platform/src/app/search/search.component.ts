@@ -9,586 +9,255 @@ import { SearchService, EventDocument, SearchResponse, SeatDocument } from '../s
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   template: `
-    <div class="search-container">
-      <header class="search-header">
-        <h1>🎫 Find Events & Tickets</h1>
-        <p>Search for events and check available seats</p>
+    <div class="page-gradient-radial">
+      <!-- Header -->
+      <header class="text-center py-12 px-4 fade-in">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl mb-4 shadow-lg">
+          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </div>
+        <h1 class="text-4xl font-bold text-white mb-2">Find Events & Tickets</h1>
+        <p class="text-gray-400">Search for events and check available seats</p>
       </header>
 
-      <div class="search-box">
-        <div class="search-input-group">
-          <input 
-            type="text" 
-            [(ngModel)]="searchQuery"
-            (keyup.enter)="searchEvents()"
-            placeholder="Search events by name..."
-            class="search-input"
-          />
-          <button (click)="searchEvents()" class="search-btn">
-            🔍 Search
-          </button>
-        </div>
-        
-        <div class="filter-buttons">
-          <button 
-            (click)="loadAvailableEvents()" 
-            class="filter-btn"
-            [class.active]="currentFilter() === 'available'">
-            ✅ Available Events
-          </button>
-          <button 
-            (click)="loadAllEvents()" 
-            class="filter-btn"
-            [class.active]="currentFilter() === 'all'">
-            📋 All Events
-          </button>
+      <!-- Search Box -->
+      <div class="max-w-4xl mx-auto px-4 mb-8 slide-up">
+        <div class="glass-card p-6">
+          <div class="flex flex-col sm:flex-row gap-4 mb-4">
+            <div class="flex-1 relative">
+              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+              </div>
+              <input 
+                type="text" 
+                [(ngModel)]="searchQuery"
+                (keyup.enter)="searchEvents()"
+                placeholder="Search events by name..."
+                class="input-field pl-12"
+              />
+            </div>
+            <button (click)="searchEvents()" class="btn-primary px-8">
+              Search
+            </button>
+          </div>
+          
+          <div class="flex flex-wrap gap-3">
+            <button 
+              (click)="loadAvailableEvents()" 
+              class="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200"
+              [class]="currentFilter() === 'available' 
+                ? 'bg-indigo-500 text-white' 
+                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'">
+              <span class="flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Available Events
+              </span>
+            </button>
+            <button 
+              (click)="loadAllEvents()" 
+              class="px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200"
+              [class]="currentFilter() === 'all' 
+                ? 'bg-indigo-500 text-white' 
+                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'">
+              <span class="flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                </svg>
+                All Events
+              </span>
+            </button>
+          </div>
         </div>
       </div>
 
-      @if (loading()) {
-        <div class="loading">
-          <div class="spinner"></div>
-          <p>Loading events...</p>
-        </div>
-      }
+      <!-- Content Area -->
+      <div class="max-w-7xl mx-auto px-4 pb-12">
+        @if (loading()) {
+          <div class="flex flex-col items-center justify-center py-16 fade-in">
+            <div class="spinner mb-4"></div>
+            <p class="text-gray-400">Loading events...</p>
+          </div>
+        }
 
-      @if (error()) {
-        <div class="error-message">
-          <p>⚠️ {{ error() }}</p>
-          <button (click)="loadAllEvents()" class="retry-btn">Try Again</button>
-        </div>
-      }
+        @if (error()) {
+          <div class="glass-card p-8 text-center max-w-md mx-auto" style="background: var(--color-error-bg); border: 1px solid rgba(239, 68, 68, 0.3);">
+            <svg class="w-12 h-12 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <p class="text-red-400 mb-4">{{ error() }}</p>
+            <button (click)="loadAllEvents()" class="btn-primary">Try Again</button>
+          </div>
+        }
 
-      @if (!loading() && !error()) {
-        <div class="events-grid">
-          @for (event of events(); track event.id) {
-            <div class="event-card" [class.no-seats]="event.availableSeats === 0">
-              <div class="event-header">
-                <span class="event-type">{{ event.type }}</span>
-                <span class="event-status" [class]="event.status.toLowerCase()">
-                  {{ event.status }}
-                </span>
-              </div>
-              
-              <h3 class="event-name">{{ event.name }}</h3>
-              
-              <div class="event-details">
-                <div class="detail">
-                  <span class="label">📅 Start</span>
-                  <span class="value">{{ formatDate(event.startTime) }}</span>
-                </div>
-                <div class="detail">
-                  <span class="label">🏁 End</span>
-                  <span class="value">{{ formatDate(event.endTime) }}</span>
-                </div>
-              </div>
-              
-              <div class="seats-info">
-                <div class="seats-available">
-                  <span class="seats-number">{{ event.availableSeats }}</span>
-                  <span class="seats-label">Available</span>
-                </div>
-                <div class="seats-total">
-                  <span>of {{ event.totalSeats }} total</span>
-                </div>
-              </div>
-              
-              <button 
-                (click)="viewEventSeats(event)"
-                class="view-seats-btn"
-                [disabled]="event.availableSeats === 0">
-                {{ event.availableSeats > 0 ? '🎟️ View Seats' : 'Sold Out' }}
-              </button>
-            </div>
-          } @empty {
-            <div class="no-events">
-              <p>🔍 No events found</p>
-              <p>Try a different search or check back later</p>
-            </div>
-          }
-        </div>
-      }
-
-      @if (selectedEvent()) {
-        <div class="modal-overlay" (click)="closeModal()">
-          <div class="modal-content" (click)="$event.stopPropagation()">
-            <button class="close-btn" (click)="closeModal()">✕</button>
-            
-            <h2>{{ selectedEvent()?.eventName }}</h2>
-            <p class="modal-subtitle">Available Seats: {{ selectedEvent()?.availableSeats }} / {{ selectedEvent()?.totalSeats }}</p>
-            
-            @if (loadingSeats()) {
-              <div class="loading">
-                <div class="spinner"></div>
-              </div>
-            } @else {
-              <div class="seats-grid">
-                @for (seat of selectedEvent()?.seats; track seat.id) {
-                  <div 
-                    class="seat" 
-                    [class.available]="seat.status === 'AVAILABLE'"
-                    [class.reserved]="seat.status === 'RESERVED'"
-                    [class.sold]="seat.status === 'SOLD'"
-                    [class.selected]="isSelected(seat)"
-                    (click)="toggleSeatSelection(seat)">
-                    <span class="seat-label">{{ seat.rowNumber }}{{ seat.seatNumber }}</span>
-                    <span class="seat-price">\${{ seat.price }}</span>
+        @if (!loading() && !error()) {
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @for (event of events(); track event.id; let i = $index) {
+              <div class="glass-card overflow-hidden group slide-up" 
+                   [style.animation-delay]="(i * 0.05) + 's'"
+                   [class.opacity-60]="event.availableSeats === 0">
+                <!-- Card Header -->
+                <div class="h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500"></div>
+                
+                <div class="p-6">
+                  <div class="flex justify-between items-start mb-4">
+                    <span class="badge-default">{{ event.type }}</span>
+                    <span class="badge-default" 
+                          [class]="event.status === 'PUBLISHED' ? 'badge-success' : 'badge-warning'">
+                      {{ event.status }}
+                    </span>
                   </div>
-                } @empty {
-                  <p class="no-seats">No seats available</p>
-                }
-              </div>
-              
-              @if (selectedSeats().length > 0) {
-                <div class="selection-summary">
-                  <p>Selected: {{ selectedSeats().length }} seat(s)</p>
-                  <p>Total: \${{ calculateTotal() }}</p>
-                  <button class="book-btn" (click)="proceedToBooking()">
-                    🎫 Proceed to Booking
+                  
+                  <h3 class="text-xl font-bold text-white mb-4 group-hover:text-indigo-400 transition-colors">
+                    {{ event.name }}
+                  </h3>
+                  
+                  <div class="space-y-2 mb-4 text-sm">
+                    <div class="flex items-center gap-2 text-gray-400">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                      </svg>
+                      {{ formatDate(event.startTime) }}
+                    </div>
+                    <div class="flex items-center gap-2 text-gray-400">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      {{ formatDate(event.endTime) }}
+                    </div>
+                  </div>
+                  
+                  <!-- Seats Info -->
+                  <div class="bg-gray-800/50 rounded-xl p-4 mb-4">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <span class="text-3xl font-bold" 
+                              [class]="event.availableSeats > 0 ? 'text-emerald-400' : 'text-red-400'">
+                          {{ event.availableSeats }}
+                        </span>
+                        <span class="text-gray-500 text-sm ml-1">available</span>
+                      </div>
+                      <div class="text-right text-gray-500 text-sm">
+                        of {{ event.totalSeats }} total
+                      </div>
+                    </div>
+                    <!-- Progress bar -->
+                    <div class="mt-2 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                      <div class="h-full rounded-full transition-all duration-500"
+                           [class]="event.availableSeats > 0 ? 'bg-gradient-to-r from-emerald-500 to-emerald-400' : 'bg-red-500'"
+                           [style.width.%]="(event.availableSeats / event.totalSeats) * 100">
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <button 
+                    (click)="viewEventSeats(event)"
+                    [disabled]="event.availableSeats === 0"
+                    class="w-full py-3 rounded-xl font-semibold transition-all duration-200"
+                    [class]="event.availableSeats > 0 
+                      ? 'btn-accent' 
+                      : 'bg-gray-700 text-gray-500 cursor-not-allowed'">
+                    {{ event.availableSeats > 0 ? 'View Seats' : 'Sold Out' }}
                   </button>
                 </div>
-              }
+              </div>
+            } @empty {
+              <div class="col-span-full text-center py-16">
+                <svg class="w-16 h-16 text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <p class="text-gray-400 text-lg">No events found</p>
+                <p class="text-gray-600">Try a different search or check back later</p>
+              </div>
             }
+          </div>
+        }
+      </div>
+
+      <!-- Modal -->
+      @if (selectedEvent()) {
+        <div class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4" 
+             (click)="closeModal()">
+          <div class="glass-card max-w-3xl w-full max-h-[90vh] overflow-y-auto slide-up" 
+               (click)="$event.stopPropagation()">
+            <div class="sticky top-0 bg-gray-900/95 backdrop-blur p-6 border-b border-gray-700/50 flex justify-between items-start">
+              <div>
+                <h2 class="text-2xl font-bold text-white">{{ selectedEvent()?.eventName }}</h2>
+                <p class="text-gray-400 mt-1">
+                  Available: {{ selectedEvent()?.availableSeats }} / {{ selectedEvent()?.totalSeats }} seats
+                </p>
+              </div>
+              <button (click)="closeModal()" class="p-2 hover:bg-gray-800 rounded-lg transition-colors text-gray-400 hover:text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
             
-            <div class="legend">
-              <div class="legend-item">
-                <div class="legend-color available"></div>
-                <span>Available</span>
-              </div>
-              <div class="legend-item">
-                <div class="legend-color reserved"></div>
-                <span>Reserved</span>
-              </div>
-              <div class="legend-item">
-                <div class="legend-color sold"></div>
-                <span>Sold</span>
-              </div>
+            <div class="p-6">
+              @if (loadingSeats()) {
+                <div class="flex justify-center py-8">
+                  <div class="spinner"></div>
+                </div>
+              } @else {
+                <div class="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2 mb-6">
+                  @for (seat of selectedEvent()?.seats; track seat.id) {
+                    <button 
+                      class="aspect-square rounded-lg flex flex-col items-center justify-center text-xs font-medium transition-all duration-200"
+                      [class]="getSeatClass(seat)"
+                      [disabled]="seat.status !== 'AVAILABLE'"
+                      (click)="toggleSeatSelection(seat)">
+                      <span>{{ seat.rowNumber }}{{ seat.seatNumber }}</span>
+                      <span class="text-[10px] opacity-70">\${{ seat.price }}</span>
+                    </button>
+                  } @empty {
+                    <p class="col-span-full text-center text-gray-500 py-8">No seats available</p>
+                  }
+                </div>
+                
+                @if (selectedSeats().length > 0) {
+                  <div class="bg-gray-800/50 rounded-xl p-4 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                      <span class="text-gray-400">Selected: {{ selectedSeats().length }} seat(s)</span>
+                      <span class="text-2xl font-bold text-emerald-400">\${{ calculateTotal() }}</span>
+                    </div>
+                    <button (click)="proceedToBooking()" class="btn-accent w-full py-3">
+                      Proceed to Booking
+                    </button>
+                  </div>
+                }
+                
+                <!-- Legend -->
+                <div class="flex flex-wrap justify-center gap-4 pt-4 border-t border-gray-700/50">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded bg-emerald-500/20 border-2 border-emerald-500"></div>
+                    <span class="text-gray-400 text-sm">Available</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded bg-amber-500/20 border-2 border-amber-500"></div>
+                    <span class="text-gray-400 text-sm">Reserved</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded bg-red-500/20 border-2 border-red-500"></div>
+                    <span class="text-gray-400 text-sm">Sold</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded bg-indigo-500 border-2 border-indigo-400"></div>
+                    <span class="text-gray-400 text-sm">Selected</span>
+                  </div>
+                </div>
+              }
             </div>
           </div>
         </div>
       }
     </div>
   `,
-  styles: [`
-    .search-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-
-    .search-header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    .search-header h1 {
-      font-size: 2.5rem;
-      color: #1a1a2e;
-      margin-bottom: 0.5rem;
-    }
-
-    .search-header p {
-      color: #666;
-      font-size: 1.1rem;
-    }
-
-    .search-box {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-      margin-bottom: 2rem;
-    }
-
-    .search-input-group {
-      display: flex;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .search-input {
-      flex: 1;
-      padding: 1rem 1.5rem;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: border-color 0.3s;
-    }
-
-    .search-input:focus {
-      outline: none;
-      border-color: #6c5ce7;
-    }
-
-    .search-btn {
-      padding: 1rem 2rem;
-      background: #6c5ce7;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .search-btn:hover {
-      background: #5b4cdb;
-    }
-
-    .filter-buttons {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .filter-btn {
-      padding: 0.75rem 1.5rem;
-      background: #f5f5f5;
-      border: none;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .filter-btn:hover, .filter-btn.active {
-      background: #6c5ce7;
-      color: white;
-    }
-
-    .loading {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 3rem;
-    }
-
-    .spinner {
-      width: 50px;
-      height: 50px;
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #6c5ce7;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .error-message {
-      text-align: center;
-      padding: 2rem;
-      background: #fff5f5;
-      border-radius: 8px;
-      color: #c0392b;
-    }
-
-    .retry-btn {
-      margin-top: 1rem;
-      padding: 0.75rem 1.5rem;
-      background: #c0392b;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .events-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .event-card {
-      background: white;
-      border-radius: 12px;
-      padding: 1.5rem;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-
-    .event-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-    }
-
-    .event-card.no-seats {
-      opacity: 0.7;
-    }
-
-    .event-header {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 1rem;
-    }
-
-    .event-type {
-      background: #e8e5ff;
-      color: #6c5ce7;
-      padding: 0.25rem 0.75rem;
-      border-radius: 20px;
-      font-size: 0.85rem;
-    }
-
-    .event-status {
-      padding: 0.25rem 0.75rem;
-      border-radius: 20px;
-      font-size: 0.85rem;
-    }
-
-    .event-status.active {
-      background: #d4edda;
-      color: #155724;
-    }
-
-    .event-status.upcoming {
-      background: #fff3cd;
-      color: #856404;
-    }
-
-    .event-name {
-      font-size: 1.25rem;
-      color: #1a1a2e;
-      margin-bottom: 1rem;
-    }
-
-    .event-details {
-      margin-bottom: 1rem;
-    }
-
-    .detail {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.5rem 0;
-      border-bottom: 1px solid #f0f0f0;
-    }
-
-    .label {
-      color: #666;
-    }
-
-    .value {
-      color: #1a1a2e;
-      font-weight: 500;
-    }
-
-    .seats-info {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem;
-      background: #f8f9fa;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-    }
-
-    .seats-available {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .seats-number {
-      font-size: 2rem;
-      font-weight: bold;
-      color: #27ae60;
-    }
-
-    .seats-label {
-      font-size: 0.85rem;
-      color: #666;
-    }
-
-    .seats-total {
-      color: #666;
-    }
-
-    .view-seats-btn {
-      width: 100%;
-      padding: 1rem;
-      background: #6c5ce7;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .view-seats-btn:hover:not(:disabled) {
-      background: #5b4cdb;
-    }
-
-    .view-seats-btn:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
-
-    .no-events {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 3rem;
-      color: #666;
-    }
-
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-
-    .modal-content {
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      max-width: 800px;
-      width: 90%;
-      max-height: 90vh;
-      overflow-y: auto;
-      position: relative;
-    }
-
-    .close-btn {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: #666;
-    }
-
-    .modal-subtitle {
-      color: #666;
-      margin-bottom: 1.5rem;
-    }
-
-    .seats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .seat {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 0.75rem;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .seat.available {
-      background: #d4edda;
-      border: 2px solid #28a745;
-    }
-
-    .seat.available:hover {
-      background: #28a745;
-      color: white;
-    }
-
-    .seat.reserved {
-      background: #fff3cd;
-      border: 2px solid #ffc107;
-      cursor: not-allowed;
-    }
-
-    .seat.sold {
-      background: #f8d7da;
-      border: 2px solid #dc3545;
-      cursor: not-allowed;
-    }
-
-    .seat.selected {
-      background: #6c5ce7;
-      border-color: #6c5ce7;
-      color: white;
-    }
-
-    .seat-label {
-      font-weight: bold;
-      font-size: 0.9rem;
-    }
-
-    .seat-price {
-      font-size: 0.75rem;
-      opacity: 0.8;
-    }
-
-    .no-seats {
-      grid-column: 1 / -1;
-      text-align: center;
-      color: #666;
-    }
-
-    .selection-summary {
-      background: #f8f9fa;
-      padding: 1rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-
-    .book-btn {
-      margin-top: 1rem;
-      padding: 1rem 2rem;
-      background: #27ae60;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-
-    .book-btn:hover {
-      background: #219a52;
-    }
-
-    .legend {
-      display: flex;
-      justify-content: center;
-      gap: 1.5rem;
-      padding-top: 1rem;
-      border-top: 1px solid #eee;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .legend-color {
-      width: 20px;
-      height: 20px;
-      border-radius: 4px;
-    }
-
-    .legend-color.available {
-      background: #d4edda;
-      border: 2px solid #28a745;
-    }
-
-    .legend-color.reserved {
-      background: #fff3cd;
-      border: 2px solid #ffc107;
-    }
-
-    .legend-color.sold {
-      background: #f8d7da;
-      border: 2px solid #dc3545;
-    }
-  `]
+  styles: []
 })
 export class SearchComponent implements OnInit {
   searchQuery = '';
@@ -701,6 +370,22 @@ export class SearchComponent implements OnInit {
 
   isSelected(seat: SeatDocument): boolean {
     return this.selectedSeats().some(s => s.id === seat.id);
+  }
+
+  getSeatClass(seat: SeatDocument): string {
+    if (this.isSelected(seat)) {
+      return 'bg-indigo-500 border-2 border-indigo-400 text-white';
+    }
+    switch (seat.status) {
+      case 'AVAILABLE':
+        return 'bg-emerald-500/20 border-2 border-emerald-500 text-emerald-400 hover:bg-emerald-500 hover:text-white cursor-pointer';
+      case 'RESERVED':
+        return 'bg-amber-500/20 border-2 border-amber-500 text-amber-400 cursor-not-allowed';
+      case 'SOLD':
+        return 'bg-red-500/20 border-2 border-red-500 text-red-400 cursor-not-allowed';
+      default:
+        return 'bg-gray-700 border-2 border-gray-600 text-gray-400';
+    }
   }
 
   calculateTotal(): number {

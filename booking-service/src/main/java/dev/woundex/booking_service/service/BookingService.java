@@ -47,7 +47,6 @@ public class BookingService {
 
     @Transactional
     public BookResponse createBooking(BookRequest req , String jwt){
-        // Strip "Bearer " prefix if present
         String token = jwt.startsWith("Bearer ") ? jwt.substring(7) : jwt;
         UserResponse user = authClient.validateToken(token);
 
@@ -55,7 +54,6 @@ public class BookingService {
         List<Long> seatIds = req.getSeatIds();
         UUID userId = user.getId();
 
-        // Initialize Redis inventory from database if not exists
         String inventoryKey = "tickets:available:" + eventId;
         if (!redisson.getBucket(inventoryKey).isExists()) {
             int availableSeats = seatRepository.countByEventIdAndStatus(eventId, SeatStatus.AVAILABLE);
@@ -117,10 +115,8 @@ public class BookingService {
             redisson.getBucket("order_expiry:" + order.getId())
                     .set("PENDING", 5, TimeUnit.MINUTES);
 
-            // Publish order created event for payment service
             kafkaTemplate.send("orders.topic", new OrderCreatedEvent(order.getId(), userId, order.getTotalAmount()));
             
-            // Publish ticket reserved event for search service
             kafkaTemplate.send("ticket-reserved", new TicketReservedEvent(order.getId(), eventId, seatIds, userId));
 
             return new BookResponse(order.getId(), "RESERVED_WAITING_PAYMENT");
@@ -143,4 +139,12 @@ public class BookingService {
             .map(seat -> seat.getSeatType().getPrice())
             .reduce(BigDecimal.ZERO, BigDecimal::add);
 }
+
+    public BookResponse getOrder(String id){
+        UUID orderId = UUID.fromString(id);
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        return new BookResponse(order.getId(), order.getStatus().name());
+    }
 }

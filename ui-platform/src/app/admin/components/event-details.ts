@@ -181,8 +181,8 @@ export class EventDetails implements OnInit {
 
   getStatusClass(status: EventStatus): string {
     const classes: Record<string, string> = {
-      'DRAFT': 'bg-yellow-500/20 text-yellow-400',
-      'PUBLISHED': 'bg-green-500/20 text-green-400',
+      'DRAFT': 'bg-amber-500/20 text-amber-400',
+      'PUBLISHED': 'bg-emerald-500/20 text-emerald-400',
       'ARCHIVED': 'bg-gray-500/20 text-gray-400',
       'CANCELLED': 'bg-red-500/20 text-red-400'
     };
@@ -191,10 +191,10 @@ export class EventDetails implements OnInit {
 
   getSeatTypeColorClass(name: string): string {
     const lowerName = name.toLowerCase();
-    if (lowerName.includes('vip')) return 'bg-purple-500/20 text-purple-400';
-    if (lowerName.includes('premium')) return 'bg-pink-500/20 text-pink-400';
-    if (lowerName.includes('standard')) return 'bg-blue-500/20 text-blue-400';
-    if (lowerName.includes('economy')) return 'bg-green-500/20 text-green-400';
+    if (lowerName.includes('vip')) return 'bg-indigo-500/20 text-indigo-400';
+    if (lowerName.includes('premium')) return 'bg-purple-500/20 text-purple-400';
+    if (lowerName.includes('standard')) return 'bg-sky-500/20 text-sky-400';
+    if (lowerName.includes('economy')) return 'bg-emerald-500/20 text-emerald-400';
     return 'bg-gray-500/20 text-gray-400';
   }
 }

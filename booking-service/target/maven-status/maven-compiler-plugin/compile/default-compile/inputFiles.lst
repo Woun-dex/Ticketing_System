@@ -1,6 +1,7 @@
 C:\Users\Woundex\Documents\Project\ticketing_System\booking-service\src\main\java\dev\woundex\booking_service\BookingServiceApplication.java
 C:\Users\Woundex\Documents\Project\ticketing_System\booking-service\src\main\java\dev\woundex\booking_service\client\AuthClient.java
 C:\Users\Woundex\Documents\Project\ticketing_System\booking-service\src\main\java\dev\woundex\booking_service\config\KafkaConfig.java
+C:\Users\Woundex\Documents\Project\ticketing_System\booking-service\src\main\java\dev\woundex\booking_service\config\MetricsConfig.java
 C:\Users\Woundex\Documents\Project\ticketing_System\booking-service\src\main\java\dev\woundex\booking_service\config\OrderExpiryListener.java
 C:\Users\Woundex\Documents\Project\ticketing_System\booking-service\src\main\java\dev\woundex\booking_service\config\RedisKeyspaceConfig.java
 C:\Users\Woundex\Documents\Project\ticketing_System\booking-service\src\main\java\dev\woundex\booking_service\config\RedissonConfig.java
