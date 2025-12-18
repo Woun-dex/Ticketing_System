@@ -19,7 +19,7 @@ class JwtServiceTest {
 
     @BeforeEach
     void setUp() {
-        jwtService = new JwtService();
+        jwtService = new JwtService(null);
         ReflectionTestUtils.setField(jwtService, "SecretKey", TEST_SECRET);
     }
 

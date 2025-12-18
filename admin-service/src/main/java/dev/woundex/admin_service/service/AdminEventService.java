@@ -89,7 +89,8 @@ public class AdminEventService {
             throw new IllegalStateException("Event must be DRAFT to publish");
         }
 
-        int totalSeats = seatRepository.countByEventId(eventId);
+        List<Seat> seats = seatRepository.findByEventId(eventId);
+        int totalSeats = seats.size();
         if (totalSeats == 0) {
             throw new IllegalStateException("Cannot publish event with 0 seats");
         }
@@ -97,7 +98,22 @@ public class AdminEventService {
         event.setStatus(EventStatus.PUBLISHED);
         eventRepository.save(event);
 
+        // Send event published message
         kafkaProducer.sendEventPublished(event.getId(), event.getName(), totalSeats);
+
+        // Send seats for indexing in Elasticsearch
+        List<SeatIndexMessage> seatMessages = seats.stream()
+                .map(seat -> SeatIndexMessage.builder()
+                        .id(seat.getId())
+                        .eventId(event.getId())
+                        .rowNumber(seat.getRowNumber())
+                        .seatNumber(seat.getSeatNumber())
+                        .status(seat.getStatus().name())
+                        .seatTypeName(seat.getSeatType().getName())
+                        .price(seat.getSeatType().getPrice())
+                        .build())
+                .toList();
+        kafkaProducer.sendSeatsForIndexing(seatMessages);
     }
 
     public EventInventoryResponse getEventInventory(Long eventId) {
@@ -135,7 +151,6 @@ public class AdminEventService {
         Seat seat = seatRepository.findById(seatId)
                 .orElseThrow(() -> new RuntimeException("Seat not found"));
 
-        // Validation: Don't mess with sold seats
         if (seat.getStatus() == SeatStatus.SOLD) {
             throw new IllegalStateException("Cannot edit a SOLD seat");
         }
@@ -185,11 +200,13 @@ public class AdminEventService {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
-        if (event.getStatus() == EventStatus.PUBLISHED) {
-            throw new IllegalStateException("Cannot delete a published event");
-        }
+        // Delete order seats first (due to foreign key constraint)
+        eventRepository.deleteOrderSeatsByEventId(eventId);
+        
+        // Delete orders for this event
+        eventRepository.deleteOrdersByEventId(eventId);
 
-        // Delete all seats first
+        // Delete all seats
         seatRepository.deleteByEventId(eventId);
         
         // Delete all seat types
@@ -197,6 +214,9 @@ public class AdminEventService {
         
         // Delete the event
         eventRepository.delete(event);
+        
+        // Send event deleted message to remove from Elasticsearch
+        kafkaProducer.sendEventDeleted(eventId, event.getName());
     }
 
     @Transactional

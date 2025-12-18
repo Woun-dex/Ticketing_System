@@ -26,7 +26,25 @@ export const guestGuard: CanActivateFn = () => {
   if (authService.isAdmin()) {
     router.navigate(['/admin']);
   } else {
-    router.navigate(['/queue']);
+    router.navigate(['/events']);
   }
   return false;
+};
+
+export const adminGuard: CanActivateFn = () => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  if (!authService.isAuthenticated()) {
+    router.navigate(['/login']);
+    return false;
+  }
+
+  if (!authService.isAdmin()) {
+    console.warn('Access denied: User does not have ADMIN role');
+    router.navigate(['/events']);
+    return false;
+  }
+
+  return true;
 };

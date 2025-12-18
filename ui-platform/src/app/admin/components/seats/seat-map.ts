@@ -66,14 +66,14 @@ export class SeatMap {
     const isSelected = this.selectedSeatId === seat.id;
     
     if (isSelected) {
-      return 'bg-blue-500 text-white shadow-lg shadow-blue-500/50 ring-2 ring-blue-300';
+      return 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/50 ring-2 ring-indigo-300';
     }
 
     switch (seat.status) {
       case SeatStatus.AVAILABLE:
-        return 'bg-green-500 text-white shadow-lg shadow-green-500/30 hover:shadow-green-500/50';
+        return 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50';
       case SeatStatus.RESERVED:
-        return 'bg-yellow-500 text-white shadow-lg shadow-yellow-500/30';
+        return 'bg-amber-500 text-white shadow-lg shadow-amber-500/30';
       case SeatStatus.SOLD:
         return 'bg-red-500 text-white shadow-lg shadow-red-500/30';
       case SeatStatus.BLOCKED:
@@ -86,9 +86,9 @@ export class SeatMap {
   getStatusTextClass(status: SeatStatus): string {
     switch (status) {
       case SeatStatus.AVAILABLE:
-        return 'text-green-400';
+        return 'text-emerald-400';
       case SeatStatus.RESERVED:
-        return 'text-yellow-400';
+        return 'text-amber-400';
       case SeatStatus.SOLD:
         return 'text-red-400';
       case SeatStatus.BLOCKED:

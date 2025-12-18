@@ -1,11 +1,13 @@
 package dev.woundex.admin_service.kafka;
 
-import ch.qos.logback.classic.Logger;
 import dev.woundex.admin_service.dto.EventLifecycleMessage;
+import dev.woundex.admin_service.dto.SeatIndexMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -13,21 +15,38 @@ import org.springframework.stereotype.Service;
 public class KafkaProducerService {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
-    private static final String TOPIC = "events.lifecycle";
+    private static final String EVENTS_TOPIC = "events.lifecycle";
+    private static final String SEATS_TOPIC = "seats.index";
 
     public void sendEventCreated(Long eventId, String name) {
-        kafkaTemplate.send(TOPIC, "CREATED", new EventLifecycleMessage("CREATED", eventId, name, 0));
-        log.info("Sent CREATED event for id: {}", eventId);
+        EventLifecycleMessage message = new EventLifecycleMessage("CREATED", eventId, name, 0);
+        kafkaTemplate.send(EVENTS_TOPIC, eventId.toString(), message);
+        log.info("Sent CREATED event for id: {}, message: {}", eventId, message);
     }
 
     public void sendEventPublished(Long eventId, String name, int totalInventory) {
-        kafkaTemplate.send(TOPIC, "PUBLISH", new EventLifecycleMessage("PUBLISHED", eventId, name, totalInventory));
-        log.info("Sent PUBLISHED event for id: {} with inventory: {}", eventId, totalInventory);
+        EventLifecycleMessage message = new EventLifecycleMessage("PUBLISHED", eventId, name, totalInventory);
+        kafkaTemplate.send(EVENTS_TOPIC, eventId.toString(), message);
+        log.info("Sent PUBLISHED event for id: {} with inventory: {}, message: {}", eventId, totalInventory, message);
     }
 
     public void sendEventCancelled(Long eventId, String name) {
-        kafkaTemplate.send(TOPIC, "CANCELLED", new EventLifecycleMessage("CANCELLED", eventId, name, 0));
-        log.info("Sent CANCELLED event for id: {}", eventId);
+        EventLifecycleMessage message = new EventLifecycleMessage("CANCELLED", eventId, name, 0);
+        kafkaTemplate.send(EVENTS_TOPIC, eventId.toString(), message);
+        log.info("Sent CANCELLED event for id: {}, message: {}", eventId, message);
     }
 
+    public void sendEventDeleted(Long eventId, String name) {
+        EventLifecycleMessage message = new EventLifecycleMessage("DELETED", eventId, name, 0);
+        kafkaTemplate.send(EVENTS_TOPIC, eventId.toString(), message);
+        log.info("Sent DELETED event for id: {}, message: {}", eventId, message);
+    }
+
+    public void sendSeatsForIndexing(List<SeatIndexMessage> seats) {
+        for (SeatIndexMessage seat : seats) {
+            kafkaTemplate.send(SEATS_TOPIC, seat.getId().toString(), seat);
+            log.debug("Sent seat for indexing: {}", seat.getId());
+        }
+        log.info("Sent {} seats for indexing", seats.size());
+    }
 }

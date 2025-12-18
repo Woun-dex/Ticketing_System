@@ -34,6 +34,7 @@ interface SeatGroup {
 export class TheaterSeatMap {
   @Input() seats: Seat[] = [];
   @Input() selectedSeatId: number | null = null;
+  @Input() selectedSeatIds: number[] = []; // Support multiple selection
   @Input() editMode = false;
   
   @Output() seatClick = new EventEmitter<Seat>();
@@ -118,25 +119,26 @@ export class TheaterSeatMap {
   getRowLabelClass(row: string): string {
     // VIP rows get special styling
     if (row.toLowerCase().includes('vip') || row === 'A' || row === 'B') {
-      return 'bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/30';
+      return 'bg-gradient-to-br from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/30';
     }
     return 'bg-gray-700 text-gray-300';
   }
 
   getSeatClass(seat: Seat): string {
-    const isSelected = this.selectedSeatId === seat.id;
+    // Check both single selection and multiple selection
+    const isSelected = this.selectedSeatId === seat.id || this.selectedSeatIds.includes(seat.id);
     
     const baseClasses = 'text-white';
     
     if (isSelected) {
-      return `${baseClasses} [&>div]:bg-gradient-to-br [&>div]:from-blue-400 [&>div]:to-blue-600 [&>div]:shadow-lg [&>div]:shadow-blue-500/50 [&>div]:ring-2 [&>div]:ring-blue-300`;
+      return `${baseClasses} [&>div]:bg-gradient-to-br [&>div]:from-indigo-400 [&>div]:to-indigo-600 [&>div]:shadow-lg [&>div]:shadow-indigo-500/50 [&>div]:ring-2 [&>div]:ring-indigo-300`;
     }
 
     switch (seat.status) {
       case SeatStatus.AVAILABLE:
-        return `${baseClasses} [&>div]:bg-gradient-to-br [&>div]:from-green-400 [&>div]:to-green-600 [&>div]:shadow-lg [&>div]:shadow-green-500/30 hover:[&>div]:shadow-green-500/50`;
+        return `${baseClasses} [&>div]:bg-gradient-to-br [&>div]:from-emerald-400 [&>div]:to-emerald-600 [&>div]:shadow-lg [&>div]:shadow-emerald-500/30 hover:[&>div]:shadow-emerald-500/50`;
       case SeatStatus.RESERVED:
-        return `${baseClasses} [&>div]:bg-gradient-to-br [&>div]:from-yellow-400 [&>div]:to-yellow-600 [&>div]:shadow-lg [&>div]:shadow-yellow-500/30`;
+        return `${baseClasses} [&>div]:bg-gradient-to-br [&>div]:from-amber-400 [&>div]:to-amber-600 [&>div]:shadow-lg [&>div]:shadow-amber-500/30`;
       case SeatStatus.SOLD:
         return `${baseClasses} [&>div]:bg-gradient-to-br [&>div]:from-red-400 [&>div]:to-red-600 [&>div]:shadow-lg [&>div]:shadow-red-500/30`;
       case SeatStatus.BLOCKED:
@@ -149,9 +151,9 @@ export class TheaterSeatMap {
   getStatusTextClass(status: SeatStatus): string {
     switch (status) {
       case SeatStatus.AVAILABLE:
-        return 'text-green-400';
+        return 'text-emerald-400';
       case SeatStatus.RESERVED:
-        return 'text-yellow-400';
+        return 'text-amber-400';
       case SeatStatus.SOLD:
         return 'text-red-400';
       case SeatStatus.BLOCKED:

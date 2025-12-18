@@ -1,0 +1,160 @@
+<div class="page-gradient-radial">
+  <!-- Header -->
+  <header class="navbar sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div class="flex items-center justify-between">
+        <button 
+          (click)="goBack()" 
+          class="btn-ghost">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+          </svg>
+          Back
+        </button>
+        
+        <h1 class="text-xl font-bold text-white">{{ eventInfo()?.eventName || 'Select Your Seats' }}</h1>
+        
+        <!-- Timer -->
+        @if (timeRemaining() > 0) {
+          <div class="flex items-center gap-2 px-4 py-2 rounded-xl font-mono"
+               [class]="timeRemaining() <= 60 ? 'bg-red-500/20 border border-red-500/30 text-red-400' : 'bg-indigo-500/20 border border-indigo-500/30 text-indigo-400'">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="font-bold">{{ formatTime(timeRemaining()) }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Loading State -->
+    @if (loading()) {
+      <div class="flex flex-col items-center justify-center py-20 fade-in">
+        <div class="spinner mb-4"></div>
+        <p class="text-gray-400">Loading seats...</p>
+      </div>
+    }
+
+    <!-- Error State -->
+    @if (error()) {
+      <div class="glass-card p-8 text-center slide-up" style="background: var(--color-error-bg); border: 1px solid rgba(239, 68, 68, 0.3);">
+        <svg class="w-16 h-16 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        <p class="text-red-400 text-lg mb-4">{{ error() }}</p>
+        <button 
+          (click)="loadSeats()" 
+          class="px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-colors font-semibold">
+          Try Again
+        </button>
+      </div>
+    }
+
+    <!-- Main Content -->
+    @if (!loading() && !error() && eventInfo()) {
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Seat Map Section -->
+        <div class="lg:col-span-2 slide-up">
+          <app-theater-seat-map
+            [seats]="mappedSeats()"
+            [selectedSeatIds]="selectedSeatIds()"
+            [editMode]="false"
+            (seatClick)="onSeatClick($event)">
+          </app-theater-seat-map>
+        </div>
+
+        <!-- Booking Summary Sidebar -->
+        <div class="lg:col-span-1 slide-up" style="animation-delay: 0.1s;">
+          <div class="glass-card sticky top-24 overflow-hidden">
+            <!-- Event Info -->
+            <div class="p-6 border-b border-gray-700/50">
+              <h2 class="text-lg font-bold text-white mb-2">{{ eventInfo()?.eventName }}</h2>
+              <p class="text-gray-400 text-sm">{{ eventInfo()?.eventType }}</p>
+              <div class="mt-4 flex items-center gap-4 text-sm">
+                <div class="flex items-center gap-2">
+                  <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                  <span class="text-gray-300">{{ eventInfo()?.availableSeats }} available</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <div class="w-3 h-3 rounded-full bg-gray-600"></div>
+                  <span class="text-gray-300">{{ (eventInfo()?.totalSeats || 0) - (eventInfo()?.availableSeats || 0) }} sold</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Selected Seats -->
+            <div class="p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="font-semibold text-white">Your Selection</h3>
+                @if (selectedSeats().length > 0) {
+                  <button 
+                    (click)="clearSelection()" 
+                    class="text-sm text-red-400 hover:text-red-300 transition-colors font-medium">
+                    Clear All
+                  </button>
+                }
+              </div>
+
+              @if (selectedSeats().length === 0) {
+                <div class="text-center py-8">
+                  <svg class="w-12 h-12 text-gray-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                  </svg>
+                  <p class="text-gray-500 text-sm">Click on available seats to select them</p>
+                </div>
+              } @else {
+                <div class="space-y-2 max-h-64 overflow-y-auto mb-4 custom-scrollbar">
+                  @for (seat of selectedSeats(); track seat.id) {
+                    <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-xl group hover:bg-gray-700/50 transition-colors">
+                      <div>
+                        <span class="text-white font-medium">Row {{ seat.rowNumber }} - Seat {{ seat.seatNumber }}</span>
+                        <p class="text-gray-500 text-xs">{{ seat.seatTypeName }}</p>
+                      </div>
+                      <div class="flex items-center gap-3">
+                        <span class="text-emerald-400 font-semibold">${{ seat.price }}</span>
+                        <button 
+                          (click)="removeSeat(seat)"
+                          class="w-6 h-6 flex items-center justify-center rounded-full bg-red-500/20 text-red-400 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500/30 hover:scale-110">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+
+                <!-- Total -->
+                <div class="border-t border-gray-700/50 pt-4">
+                  <div class="flex items-center justify-between mb-4">
+                    <span class="text-gray-400">Total ({{ selectedSeats().length }} {{ selectedSeats().length === 1 ? 'seat' : 'seats' }})</span>
+                    <span class="text-2xl font-bold text-emerald-400">${{ totalPrice() }}</span>
+                  </div>
+
+                  <button 
+                    (click)="confirmBooking()"
+                    [disabled]="booking() || selectedSeats().length === 0"
+                    class="btn-primary w-full py-3.5">
+                    @if (booking()) {
+                      <span class="flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Processing...
+                      </span>
+                    } @else {
+                      Confirm Booking
+                    }
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

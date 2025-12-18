@@ -44,8 +44,8 @@ export class EventList implements OnInit {
 
   getStatusClass(status: EventStatus): string {
     const classes: Record<string, string> = {
-      'DRAFT': 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30',
-      'PUBLISHED': 'bg-green-500/20 text-green-400 border border-green-500/30',
+      'DRAFT': 'bg-amber-500/20 text-amber-400 border border-amber-500/30',
+      'PUBLISHED': 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30',
       'ARCHIVED': 'bg-gray-500/20 text-gray-400 border border-gray-500/30',
       'CANCELLED': 'bg-red-500/20 text-red-400 border border-red-500/30'
     };
@@ -54,10 +54,10 @@ export class EventList implements OnInit {
 
   getEventBgClass(type: string): string {
     const classes: Record<string, string> = {
-      'concert': 'bg-gradient-to-br from-purple-600 to-pink-600',
-      'sports': 'bg-gradient-to-br from-green-600 to-teal-600',
-      'theater': 'bg-gradient-to-br from-pink-600 to-rose-600',
-      'conference': 'bg-gradient-to-br from-blue-600 to-indigo-600'
+      'concert': 'bg-gradient-to-br from-indigo-600 to-purple-600',
+      'sports': 'bg-gradient-to-br from-emerald-600 to-teal-600',
+      'theater': 'bg-gradient-to-br from-purple-600 to-indigo-600',
+      'conference': 'bg-gradient-to-br from-indigo-600 to-blue-600'
     };
     return classes[type.toLowerCase()] || 'bg-gradient-to-br from-gray-600 to-gray-700';
   }
